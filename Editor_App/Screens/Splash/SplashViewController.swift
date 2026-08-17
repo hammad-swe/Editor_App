@@ -8,7 +8,10 @@
 import UIKit
 
 class SplashViewController: UIViewController {
-
+    
+    
+    @IBOutlet weak var splashIcon: UIImageView!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         splashStarter()
