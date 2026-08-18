@@ -8,9 +8,9 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
-        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="SplashViewController" customModule="Editor_App" customModuleProvider="target">
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="ExportPreviewViewController" customModule="Editor_App" customModuleProvider="target">
             <connections>
-                <outlet property="splashIcon" destination="6Q5-CK-km8" id="rav-Wf-RLu"/>
+                <outlet property="playerContainerView" destination="Phi-tq-NTN" id="Uyw-Qb-m5s"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
             </connections>
         </placeholder>
@@ -19,21 +19,25 @@
             <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="shapes1" translatesAutoresizingMaskIntoConstraints="NO" id="6Q5-CK-km8">
-                    <rect key="frame" x="132.66666666666666" y="362" width="127.99999999999997" height="128"/>
-                </imageView>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Phi-tq-NTN">
+                    <rect key="frame" x="0.0" y="118" width="393" height="500"/>
+                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="500" id="XkO-ke-KIm"/>
+                    </constraints>
+                </view>
             </subviews>
             <viewLayoutGuide key="safeArea" id="fnl-2z-Ty3"/>
             <color key="backgroundColor" systemColor="systemBackgroundColor"/>
             <constraints>
-                <constraint firstItem="6Q5-CK-km8" firstAttribute="centerY" secondItem="i5M-Pr-FkT" secondAttribute="centerY" id="c7F-IK-Wbd"/>
-                <constraint firstItem="6Q5-CK-km8" firstAttribute="centerX" secondItem="i5M-Pr-FkT" secondAttribute="centerX" id="okn-aW-92R"/>
+                <constraint firstItem="fnl-2z-Ty3" firstAttribute="trailing" secondItem="Phi-tq-NTN" secondAttribute="trailing" id="JVf-gy-dxL"/>
+                <constraint firstItem="Phi-tq-NTN" firstAttribute="top" secondItem="fnl-2z-Ty3" secondAttribute="top" id="eLz-Zq-bRd"/>
+                <constraint firstItem="Phi-tq-NTN" firstAttribute="leading" secondItem="fnl-2z-Ty3" secondAttribute="leading" id="fDe-Tf-qrL"/>
             </constraints>
             <point key="canvasLocation" x="-16" y="127"/>
         </view>
     </objects>
     <resources>
-        <image name="shapes1" width="128" height="128"/>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
