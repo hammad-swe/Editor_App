@@ -36,7 +36,7 @@
                                 <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="JBU-wj-rE9" userLabel="VideoView">
                                     <rect key="frame" x="12" y="12" width="99" height="156.33333333333334"/>
                                     <subviews>
-                                        <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="shapes1" translatesAutoresizingMaskIntoConstraints="NO" id="cc4-Kc-0kE">
+                                        <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="play-button" translatesAutoresizingMaskIntoConstraints="NO" id="cc4-Kc-0kE">
                                             <rect key="frame" x="0.0" y="0.0" width="99" height="128"/>
                                         </imageView>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Video" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="oMs-Wh-Wfc">
@@ -50,7 +50,7 @@
                                 <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="2wg-5j-KW2" userLabel="PhotoView">
                                     <rect key="frame" x="131" y="12" width="99" height="156.33333333333334"/>
                                     <subviews>
-                                        <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="shapes1" translatesAutoresizingMaskIntoConstraints="NO" id="Jsv-du-6H5">
+                                        <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="photo" translatesAutoresizingMaskIntoConstraints="NO" id="Jsv-du-6H5">
                                             <rect key="frame" x="0.0" y="0.0" width="99" height="128"/>
                                         </imageView>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Photo" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6rk-hH-frw">
@@ -64,7 +64,7 @@
                                 <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="2" translatesAutoresizingMaskIntoConstraints="NO" id="4AB-8i-6CZ" userLabel="CollegeView">
                                     <rect key="frame" x="250" y="12" width="99" height="156.33333333333334"/>
                                     <subviews>
-                                        <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" image="shapes1" translatesAutoresizingMaskIntoConstraints="NO" id="MHQ-U5-aVh">
+                                        <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" image="collage" translatesAutoresizingMaskIntoConstraints="NO" id="MHQ-U5-aVh">
                                             <rect key="frame" x="0.0" y="0.0" width="99" height="134"/>
                                         </imageView>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Collage" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="RYg-JT-jkQ">
@@ -95,6 +95,8 @@
         </view>
     </objects>
     <resources>
-        <image name="shapes1" width="128" height="128"/>
+        <image name="collage" width="128" height="128"/>
+        <image name="photo" width="128" height="128"/>
+        <image name="play-button" width="128" height="128"/>
     </resources>
 </document>

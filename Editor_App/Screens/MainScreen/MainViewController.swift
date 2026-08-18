@@ -48,7 +48,7 @@ class MainViewController: UIViewController {
     }
 
     @objc func rightButtonTapped() {
-        let vc =  SettingViewController(nibName: " SettingViewController", bundle: nil)
+        let vc =  SettingViewController(nibName: "SettingViewController", bundle: nil)
       self.navigationController?.pushViewController(vc, animated: true)
     }
     
@@ -71,7 +71,17 @@ class MainViewController: UIViewController {
         }
         
         @objc private func videoCardTapped() {
-            openGallery(filter: .video)
+            GalleryManager.shared.requestAccess { [weak self] granted in
+                    guard let self = self else { return }
+                    if granted {
+                        let picker = GalleryPickerViewController()
+                        picker.filter = .video
+                        picker.delegate = self
+                        self.navigationController?.pushViewController(picker, animated: true)
+                    } else {
+                        self.showPermissionDeniedAlert()
+                    }
+                }
         }
         
         @objc private func collegeCardTapped() {
@@ -107,3 +117,29 @@ class MainViewController: UIViewController {
     }
     }
     
+extension MainViewController: GalleryPickerDelegate {
+    func galleryPicker(_ picker: GalleryPickerViewController, didSelect asset: PHAsset) {
+        let spinner = UIActivityIndicatorView(style: .large)
+        spinner.center = picker.view.center
+        spinner.startAnimating()
+        picker.view.addSubview(spinner)
+        picker.navigationItem.rightBarButtonItem?.isEnabled = false
+        
+        VideoStorageManager.shared.saveVideo(from: asset) { [weak self] localURL in
+            spinner.stopAnimating()
+            spinner.removeFromSuperview()
+            
+            guard let self = self, let localURL = localURL else {
+                let alert = UIAlertController(title: "Error", message: "Couldn't load this video. Try another one.", preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "OK", style: .default))
+                picker.present(alert, animated: true)
+                picker.navigationItem.rightBarButtonItem?.isEnabled = true
+                return
+            }
+            
+            let editVC = EditingViewController()
+            editVC.videoURL = localURL
+            self.navigationController?.pushViewController(editVC, animated: true)
+        }
+    }
+}
