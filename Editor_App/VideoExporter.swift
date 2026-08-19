@@ -15,9 +15,9 @@ final class VideoExporter {
     
     func export(
         videoURL: URL,
-        icon: UIImage,
+        icon: UIImage?,
         iconFrame: CGRect,
-        headlineText: String,
+        headlineText: String?,
         headlineFont: UIFont,
         previewBounds: CGRect,
         completion: @escaping (URL?) -> Void
@@ -49,47 +49,101 @@ final class VideoExporter {
         let naturalSize = videoTrack.naturalSize.applying(videoTrack.preferredTransform)
         let videoSize = CGSize(width: abs(naturalSize.width), height: abs(naturalSize.height))
         
-        // Scale overlay coordinates from preview screen size -> actual video pixel size
-        let scaleX = videoSize.width / previewBounds.width
-        let scaleY = videoSize.height / previewBounds.height
-        
         let overlayLayer = CALayer()
         overlayLayer.frame = CGRect(origin: .zero, size: videoSize)
         
-        // Icon watermark layer
-        let iconLayer = CALayer()
-        iconLayer.contents = icon.cgImage
-        iconLayer.frame = CGRect(
-            x: iconFrame.origin.x * scaleX,
-            y: videoSize.height - (iconFrame.origin.y * scaleY) - (iconFrame.height * scaleY),
-            width: iconFrame.width * scaleX,
-            height: iconFrame.height * scaleY
-        )
-        overlayLayer.addSublayer(iconLayer)
+        // 1. Icon Watermark Layer
+        if let icon = icon {
+            let format = UIGraphicsImageRendererFormat()
+            format.scale = 2.0
+            format.opaque = false
+            let iconRenderer = UIGraphicsImageRenderer(size: icon.size, format: format)
+            let renderedImage = iconRenderer.image { _ in
+                icon.draw(in: CGRect(origin: .zero, size: icon.size))
+            }
+            
+            if let cgImage = renderedImage.cgImage {
+                let iconLayer = CALayer()
+                iconLayer.contents = cgImage
+                iconLayer.contentsGravity = .resizeAspect
+                
+                let logoSize = min(videoSize.width, videoSize.height) * 0.18
+                let padding = logoSize * 0.3
+                
+                iconLayer.frame = CGRect(
+                    x: padding,
+                    y: videoSize.height - logoSize - padding,
+                    width: logoSize,
+                    height: logoSize
+                )
+                overlayLayer.addSublayer(iconLayer)
+            }
+        }
         
-        // Headline text layer with scrolling animation
-        let textLayer = CATextLayer()
-        textLayer.string = headlineText
-        textLayer.font = headlineFont
-        textLayer.fontSize = headlineFont.pointSize * scaleY
-        textLayer.foregroundColor = UIColor.white.cgColor
-        textLayer.alignmentMode = .left
-        textLayer.contentsScale = UIScreen.main.scale
-        
-        let textWidth = (headlineText as NSString).size(withAttributes: [.font: headlineFont]).width * scaleX
-        textLayer.frame = CGRect(x: videoSize.width, y: videoSize.height - (60 * scaleY), width: textWidth, height: 40 * scaleY)
-        
-        let duration = CMTimeGetSeconds(asset.duration)
-        let marquee = CABasicAnimation(keyPath: "position.x")
-        marquee.fromValue = videoSize.width + textWidth / 2
-        marquee.toValue = -textWidth / 2
-        marquee.duration = 6.0
-        marquee.repeatCount = Float(duration / 6.0)
-        marquee.isRemovedOnCompletion = false
-        marquee.fillMode = .forwards
-        textLayer.add(marquee, forKey: "marquee")
-        
-        overlayLayer.addSublayer(textLayer)
+        // 2. Headline Text Layer - Clean Full Width Ticker (No RED Live Badge)
+        if let headlineText = headlineText, !headlineText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            let trimmedText = headlineText.trimmingCharacters(in: .whitespacesAndNewlines)
+            
+            let fontSize = max(24, videoSize.height * 0.05)
+            let fontName = headlineFont.fontName
+            
+            let textAttributes: [NSAttributedString.Key: Any] = [
+                .font: UIFont(name: fontName, size: fontSize) ?? UIFont.boldSystemFont(ofSize: fontSize)
+            ]
+            let textSize = (trimmedText as NSString).size(withAttributes: textAttributes)
+            
+            let bannerHeight = max(textSize.height * 1.6, videoSize.height * 0.09)
+            let bannerY = videoSize.height * 0.06
+            
+            // Full-width dark semi-transparent ticker bar
+            let bannerLayer = CALayer()
+            bannerLayer.frame = CGRect(x: 0, y: bannerY, width: videoSize.width, height: bannerHeight)
+            bannerLayer.backgroundColor = UIColor.black.withAlphaComponent(0.70).cgColor
+            bannerLayer.masksToBounds = true
+            overlayLayer.addSublayer(bannerLayer)
+            
+            let tickerAreaX: CGFloat = 0
+            let tickerAreaWidth = videoSize.width
+            
+            let textLayer = CATextLayer()
+            textLayer.string = trimmedText
+            textLayer.font = fontName as NSString
+            textLayer.fontSize = fontSize
+            textLayer.foregroundColor = UIColor.white.cgColor
+            textLayer.contentsScale = 2.0
+            
+            let textY = (bannerHeight - textSize.height) / 2
+            
+            if textSize.width > tickerAreaWidth - 40 {
+                // LONG TEXT: Sliding ticker animation across the full width
+                let textWidth = textSize.width + 40
+                textLayer.alignmentMode = .left
+                textLayer.frame = CGRect(x: 0, y: textY, width: textWidth, height: textSize.height + 10)
+                
+                let duration = CMTimeGetSeconds(asset.duration)
+                let marquee = CABasicAnimation(keyPath: "position.x")
+                marquee.fromValue = tickerAreaWidth + textWidth / 2
+                marquee.toValue = -textWidth / 2
+                marquee.duration = max(5.0, Double(textWidth / 100.0))
+                marquee.repeatCount = duration > 0 ? Float(duration / marquee.duration) : 100
+                marquee.beginTime = AVCoreAnimationBeginTimeAtZero // AVVideoComposition requirement!
+                marquee.isRemovedOnCompletion = false
+                marquee.fillMode = .forwards
+                
+                let tickerContainer = CALayer()
+                tickerContainer.frame = CGRect(x: tickerAreaX, y: 0, width: tickerAreaWidth, height: bannerHeight)
+                tickerContainer.masksToBounds = true
+                tickerContainer.addSublayer(textLayer)
+                bannerLayer.addSublayer(tickerContainer)
+                
+                textLayer.add(marquee, forKey: "marquee")
+            } else {
+                // SHORT TEXT: Clean centered display across full width
+                textLayer.alignmentMode = .center
+                textLayer.frame = CGRect(x: tickerAreaX, y: textY, width: tickerAreaWidth, height: textSize.height + 10)
+                bannerLayer.addSublayer(textLayer)
+            }
+        }
         
         let videoLayer = CALayer()
         videoLayer.frame = CGRect(origin: .zero, size: videoSize)
