@@ -55,10 +55,14 @@ class EditingViewController: UIViewController {
         let newStepVC: EditorStepViewController
         switch index {
         case 0:
+            let frameVC = FrameTemplatesViewController(nibName: "FrameTemplatesViewController", bundle: nil)
+            frameVC.viewModel = viewModel
+            newStepVC = frameVC
+        case 1:
             let logoVC = AddLogoStepViewController(nibName: "AddLogoStepViewController", bundle: nil)
             logoVC.viewModel = viewModel
             newStepVC = logoVC
-        case 1:
+        case 2:
             let textVC = AddTextStepViewController(nibName: "AddTextStepViewController", bundle: nil)
             textVC.viewModel = viewModel
             newStepVC = textVC

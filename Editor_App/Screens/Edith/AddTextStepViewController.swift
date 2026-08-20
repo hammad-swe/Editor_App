@@ -33,9 +33,14 @@ class AddTextStepViewController: UIViewController, EditorStepViewController {
         setupTableView()
         restoreExistingData()
     }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        restoreExistingData()
+    }
 
     private func setupUI() {
-        stepLabel.text = "Step 2 of \(viewModel?.totalSteps ?? 2): Add Headline Text"
+        stepLabel.text = "Step 3 of \(viewModel?.totalSteps ?? 3): Add Headline Text"
 
         textField.delegate = self
 

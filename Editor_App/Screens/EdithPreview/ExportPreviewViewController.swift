@@ -58,6 +58,11 @@ class ExportPreviewViewController: UIViewController {
             title: "Edit", style: .plain, target: self, action: #selector(editTapped)
         )
         navigationItem.leftBarButtonItem = editButton
+        
+        let doneButton = UIBarButtonItem(
+            title: "Done", style: .done, target: self, action: #selector(doneTapped)
+        )
+        navigationItem.rightBarButtonItem = doneButton
     }
 
     private func setupButtonsUI() {
@@ -74,6 +79,10 @@ class ExportPreviewViewController: UIViewController {
     @objc private func editTapped() {
         navigationController?.popViewController(animated: true)
     }
+    
+    @objc private func doneTapped() {
+        navigateToDashboard()
+    }
 
     @IBAction func saveProjectTapped(_ sender: UIButton) {
         let spinner = UIActivityIndicatorView(style: .large)
@@ -89,7 +98,7 @@ class ExportPreviewViewController: UIViewController {
             spinner.removeFromSuperview()
 
             if success {
-                self?.showAlert("Project saved successfully to local storage!")
+                self?.showAlertAndNavigateToDashboard("Project saved successfully to local storage!")
             } else {
                 self?.showAlert("Could not save project to local storage.")
             }
@@ -123,7 +132,7 @@ class ExportPreviewViewController: UIViewController {
                 spinner.removeFromSuperview()
 
                 if success {
-                    self?.showAlert("Video exported and saved to your Photos library!")
+                    self?.showAlertAndNavigateToDashboard("Video exported and saved to your Photos library!")
                 } else {
                     self?.showAlert("Couldn't save video: \(error?.localizedDescription ?? "unknown error")")
                 }
@@ -135,6 +144,26 @@ class ExportPreviewViewController: UIViewController {
         let alert = UIAlertController(title: nil, message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default))
         present(alert, animated: true)
+    }
+
+    private func showAlertAndNavigateToDashboard(_ message: String) {
+        let alert = UIAlertController(title: nil, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default) { [weak self] _ in
+            self?.navigateToDashboard()
+        })
+        present(alert, animated: true)
+    }
+
+    private func navigateToDashboard() {
+        if let viewControllers = navigationController?.viewControllers {
+            for vc in viewControllers {
+                if vc is MainViewController {
+                    navigationController?.popToViewController(vc, animated: true)
+                    return
+                }
+            }
+        }
+        navigationController?.popToRootViewController(animated: true)
     }
 
     deinit {

@@ -12,13 +12,27 @@ final class VideoEditingViewModel {
     
     private(set) var model: VideoEditingModel
     var currentStepIndex: Int = 0
-    let totalSteps: Int = 2
+    let totalSteps: Int = 3
     
     var isFirstStep: Bool { currentStepIndex == 0 }
     var isLastStep: Bool { currentStepIndex == totalSteps - 1 }
     
     init(videoURL: URL) {
         self.model = VideoEditingModel(videoURL: videoURL)
+    }
+    
+    // MARK: - Frame Template Editing
+    
+    func setFrame(_ frame: FrameTemplate?) {
+        model.selectedFrame = frame
+    }
+    
+    func clearFrame() {
+        model.selectedFrame = nil
+    }
+    
+    func setAspectRatio(_ ratio: VideoAspectRatio) {
+        model.aspectRatio = ratio
     }
     
     // MARK: - Logo Editing
@@ -71,6 +85,8 @@ final class VideoEditingViewModel {
     func processVideo(previewBounds: CGRect, completion: @escaping (URL?) -> Void) {
         VideoExporter.shared.export(
             videoURL: model.videoURL,
+            frameTemplate: model.selectedFrame,
+            aspectRatio: model.aspectRatio,
             icon: model.logoImage,
             iconFrame: model.logoFrame,
             headlineText: model.headlineText,

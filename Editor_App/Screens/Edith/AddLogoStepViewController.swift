@@ -37,9 +37,14 @@ class AddLogoStepViewController: UIViewController, EditorStepViewController {
         setupTableView()
         restoreExistingData()
     }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        restoreExistingData()
+    }
 
     private func setupUI() {
-        stepLabel.text = "Step 1 of \(viewModel?.totalSteps ?? 2): Add Logo to Video"
+        stepLabel.text = "Step 2 of \(viewModel?.totalSteps ?? 3): Add Logo to Video"
 
         if logoPreviewImageView != nil {
             logoPreviewImageView.layer.cornerRadius = 8

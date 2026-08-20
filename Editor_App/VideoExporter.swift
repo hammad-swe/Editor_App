@@ -15,6 +15,8 @@ final class VideoExporter {
     
     func export(
         videoURL: URL,
+        frameTemplate: FrameTemplate? = nil,
+        aspectRatio: VideoAspectRatio = .original,
         icon: UIImage?,
         iconFrame: CGRect,
         headlineText: String?,
@@ -47,10 +49,150 @@ final class VideoExporter {
         }
         
         let naturalSize = videoTrack.naturalSize.applying(videoTrack.preferredTransform)
-        let videoSize = CGSize(width: abs(naturalSize.width), height: abs(naturalSize.height))
+        var videoSize = CGSize(width: abs(naturalSize.width), height: abs(naturalSize.height))
+        
+        // Calculate target render size based on aspect ratio
+        if let targetRatio = aspectRatio.ratioValue {
+            let currentRatio = videoSize.width / videoSize.height
+            if currentRatio > targetRatio {
+                videoSize = CGSize(width: videoSize.height * targetRatio, height: videoSize.height)
+            } else {
+                videoSize = CGSize(width: videoSize.width, height: videoSize.width / targetRatio)
+            }
+        }
         
         let overlayLayer = CALayer()
         overlayLayer.frame = CGRect(origin: .zero, size: videoSize)
+        
+        // 0. Frame Template Layer
+        if let frame = frameTemplate, frame.style != .none {
+            let widthRatio = videoSize.width / 393.0
+            
+            switch frame.style {
+            case .none:
+                break
+                
+            case .classic:
+                let borderLayer = CALayer()
+                let bWidth = max(6.0, frame.borderWidth * widthRatio)
+                borderLayer.frame = CGRect(origin: .zero, size: videoSize)
+                borderLayer.borderColor = frame.borderColor.cgColor
+                borderLayer.borderWidth = bWidth
+                overlayLayer.addSublayer(borderLayer)
+                
+            case .cinematic:
+                let barHeight = videoSize.height * 0.12
+                let topBar = CALayer()
+                topBar.frame = CGRect(x: 0, y: videoSize.height - barHeight, width: videoSize.width, height: barHeight)
+                topBar.backgroundColor = UIColor.black.cgColor
+                overlayLayer.addSublayer(topBar)
+                
+                let bottomBar = CALayer()
+                bottomBar.frame = CGRect(x: 0, y: 0, width: videoSize.width, height: barHeight)
+                bottomBar.backgroundColor = UIColor.black.cgColor
+                overlayLayer.addSublayer(bottomBar)
+                
+            case .rounded:
+                let borderLayer = CALayer()
+                let bWidth = max(6.0, frame.borderWidth * widthRatio)
+                let cRadius = frame.cornerRadius * widthRatio
+                borderLayer.frame = CGRect(origin: .zero, size: videoSize)
+                borderLayer.borderColor = frame.borderColor.cgColor
+                borderLayer.borderWidth = bWidth
+                borderLayer.cornerRadius = cRadius
+                overlayLayer.addSublayer(borderLayer)
+                
+            case .polaroid:
+                let sideBorder = 14.0 * widthRatio
+                let bottomBorder = 52.0 * widthRatio
+                
+                let topBar = CALayer()
+                topBar.frame = CGRect(x: 0, y: videoSize.height - sideBorder, width: videoSize.width, height: sideBorder)
+                topBar.backgroundColor = UIColor.white.cgColor
+                overlayLayer.addSublayer(topBar)
+                
+                let leftBar = CALayer()
+                leftBar.frame = CGRect(x: 0, y: 0, width: sideBorder, height: videoSize.height)
+                leftBar.backgroundColor = UIColor.white.cgColor
+                overlayLayer.addSublayer(leftBar)
+                
+                let rightBar = CALayer()
+                rightBar.frame = CGRect(x: videoSize.width - sideBorder, y: 0, width: sideBorder, height: videoSize.height)
+                rightBar.backgroundColor = UIColor.white.cgColor
+                overlayLayer.addSublayer(rightBar)
+                
+                let bottomBar = CALayer()
+                bottomBar.frame = CGRect(x: 0, y: 0, width: videoSize.width, height: bottomBorder)
+                bottomBar.backgroundColor = UIColor.white.cgColor
+                overlayLayer.addSublayer(bottomBar)
+                
+            case .neonGlow:
+                let borderLayer = CALayer()
+                let bWidth = max(5.0, frame.borderWidth * widthRatio)
+                let cRadius = frame.cornerRadius * widthRatio
+                borderLayer.frame = CGRect(origin: .zero, size: videoSize)
+                borderLayer.borderColor = frame.borderColor.cgColor
+                borderLayer.borderWidth = bWidth
+                borderLayer.cornerRadius = cRadius
+                borderLayer.shadowColor = frame.borderColor.cgColor
+                borderLayer.shadowRadius = 15.0 * widthRatio
+                borderLayer.shadowOpacity = 0.9
+                borderLayer.shadowOffset = .zero
+                overlayLayer.addSublayer(borderLayer)
+                
+            case .vintage:
+                let borderLayer = CALayer()
+                let bWidth = max(6.0, frame.borderWidth * widthRatio)
+                borderLayer.frame = CGRect(origin: .zero, size: videoSize)
+                borderLayer.borderColor = frame.borderColor.cgColor
+                borderLayer.borderWidth = bWidth
+                overlayLayer.addSublayer(borderLayer)
+                
+                let innerBorder = CALayer()
+                let innerInset = bWidth + (4.0 * widthRatio)
+                innerBorder.frame = CGRect(
+                    x: innerInset,
+                    y: innerInset,
+                    width: videoSize.width - innerInset * 2,
+                    height: videoSize.height - innerInset * 2
+                )
+                innerBorder.borderColor = UIColor(red: 0.95, green: 0.85, blue: 0.6, alpha: 0.7).cgColor
+                innerBorder.borderWidth = max(2.0, 2.0 * widthRatio)
+                overlayLayer.addSublayer(innerBorder)
+                
+            case .newsBroadcast:
+                let borderLayer = CALayer()
+                borderLayer.frame = CGRect(origin: .zero, size: videoSize)
+                borderLayer.borderColor = UIColor.systemRed.cgColor
+                borderLayer.borderWidth = max(6.0, 8.0 * widthRatio)
+                overlayLayer.addSublayer(borderLayer)
+                
+                let topBar = CALayer()
+                topBar.frame = CGRect(x: 0, y: videoSize.height - (32.0 * widthRatio), width: videoSize.width, height: 32.0 * widthRatio)
+                topBar.backgroundColor = UIColor.systemRed.cgColor
+                overlayLayer.addSublayer(topBar)
+                
+            case .sportsBroadcast:
+                let borderLayer = CALayer()
+                borderLayer.frame = CGRect(origin: .zero, size: videoSize)
+                borderLayer.borderColor = UIColor(red: 0.1, green: 0.2, blue: 0.5, alpha: 1.0).cgColor
+                borderLayer.borderWidth = max(6.0, 8.0 * widthRatio)
+                overlayLayer.addSublayer(borderLayer)
+                
+                let topBar = CALayer()
+                topBar.frame = CGRect(x: 0, y: videoSize.height - (30.0 * widthRatio), width: videoSize.width, height: 30.0 * widthRatio)
+                topBar.backgroundColor = UIColor(red: 0.1, green: 0.2, blue: 0.5, alpha: 1.0).cgColor
+                overlayLayer.addSublayer(topBar)
+                
+            case .podcastShow:
+                let borderLayer = CALayer()
+                borderLayer.frame = CGRect(origin: .zero, size: videoSize)
+                borderLayer.borderColor = UIColor(red: 0.4, green: 0.1, blue: 0.6, alpha: 1.0).cgColor
+                borderLayer.borderWidth = max(6.0, 8.0 * widthRatio)
+                borderLayer.cornerRadius = 16.0 * widthRatio
+                overlayLayer.addSublayer(borderLayer)
+            }
+        }
         
         // 1. Icon Watermark Layer
         if let icon = icon {

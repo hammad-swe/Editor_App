@@ -9,6 +9,8 @@ import UIKit
 
 struct VideoEditingModel {
     var videoURL: URL
+    var selectedFrame: FrameTemplate? // nil or .none = no frame
+    var aspectRatio: VideoAspectRatio = .original
     var logoImage: UIImage?          // nil = no logo (skipped or removed)
     var logoFrame: CGRect = .zero    // position in preview coordinates
     var headlineText: String?        // nil = no headline (skipped or cleared)
