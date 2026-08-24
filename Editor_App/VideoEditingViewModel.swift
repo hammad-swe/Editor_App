@@ -35,7 +35,7 @@ final class VideoEditingViewModel {
         model.aspectRatio = ratio
     }
     
-    // MARK: - Logo Editing
+    // MARK: - Logo Customizations
     
     func setLogo(image: UIImage?, frame: CGRect) {
         model.logoImage = image
@@ -45,6 +45,26 @@ final class VideoEditingViewModel {
     func clearLogo() {
         model.logoImage = nil
         model.logoFrame = .zero
+    }
+    
+    func setLogoShape(_ shape: LogoShape) {
+        model.logoShape = shape
+    }
+    
+    func setLogoPositionRatio(_ ratio: CGPoint) {
+        model.logoPositionRatio = ratio
+    }
+    
+    func setCoverImage(_ image: UIImage?) {
+        model.coverImage = image
+    }
+    
+    func setCustomBorderWidth(_ width: CGFloat?) {
+        model.customBorderWidth = width
+    }
+    
+    func setCustomCornerRadius(_ radius: CGFloat?) {
+        model.customCornerRadius = radius
     }
     
     // MARK: - Headline Editing
@@ -80,15 +100,24 @@ final class VideoEditingViewModel {
         return false
     }
     
+    func setCustomFrameColor(_ color: UIColor?) {
+        model.customFrameColor = color
+    }
+    
     // MARK: - Export / Process Video
     
     func processVideo(previewBounds: CGRect, completion: @escaping (URL?) -> Void) {
         VideoExporter.shared.export(
             videoURL: model.videoURL,
             frameTemplate: model.selectedFrame,
+            customFrameColor: model.customFrameColor,
+            customBorderWidth: model.customBorderWidth,
+            customCornerRadius: model.customCornerRadius,
             aspectRatio: model.aspectRatio,
             icon: model.logoImage,
             iconFrame: model.logoFrame,
+            logoShape: model.logoShape,
+            logoPositionRatio: model.logoPositionRatio,
             headlineText: model.headlineText,
             headlineFont: model.headlineFont,
             previewBounds: previewBounds,

@@ -16,9 +16,14 @@ final class VideoExporter {
     func export(
         videoURL: URL,
         frameTemplate: FrameTemplate? = nil,
+        customFrameColor: UIColor? = nil,
+        customBorderWidth: CGFloat? = nil,
+        customCornerRadius: CGFloat? = nil,
         aspectRatio: VideoAspectRatio = .original,
         icon: UIImage?,
         iconFrame: CGRect,
+        logoShape: LogoShape = .square,
+        logoPositionRatio: CGPoint = CGPoint(x: 0.05, y: 0.05),
         headlineText: String?,
         headlineFont: UIFont,
         previewBounds: CGRect,
@@ -66,7 +71,10 @@ final class VideoExporter {
         
         // 0. Frame Template Layer
         if let frame = frameTemplate, frame.style != .none {
-            let widthRatio = videoSize.width / 393.0
+            let widthRatio = videoSize.width / 300.0
+            let frameColor = customFrameColor ?? frame.borderColor
+            let effectiveBorderWidth = customBorderWidth ?? frame.borderWidth
+            let effectiveCornerRadius = customCornerRadius ?? frame.cornerRadius
             
             switch frame.style {
             case .none:
@@ -74,9 +82,9 @@ final class VideoExporter {
                 
             case .classic:
                 let borderLayer = CALayer()
-                let bWidth = max(6.0, frame.borderWidth * widthRatio)
+                let bWidth = max(6.0, effectiveBorderWidth * widthRatio)
                 borderLayer.frame = CGRect(origin: .zero, size: videoSize)
-                borderLayer.borderColor = frame.borderColor.cgColor
+                borderLayer.borderColor = frameColor.cgColor
                 borderLayer.borderWidth = bWidth
                 overlayLayer.addSublayer(borderLayer)
                 
@@ -94,10 +102,10 @@ final class VideoExporter {
                 
             case .rounded:
                 let borderLayer = CALayer()
-                let bWidth = max(6.0, frame.borderWidth * widthRatio)
-                let cRadius = frame.cornerRadius * widthRatio
+                let bWidth = max(6.0, effectiveBorderWidth * widthRatio)
+                let cRadius = effectiveCornerRadius * widthRatio
                 borderLayer.frame = CGRect(origin: .zero, size: videoSize)
-                borderLayer.borderColor = frame.borderColor.cgColor
+                borderLayer.borderColor = frameColor.cgColor
                 borderLayer.borderWidth = bWidth
                 borderLayer.cornerRadius = cRadius
                 overlayLayer.addSublayer(borderLayer)
@@ -128,13 +136,13 @@ final class VideoExporter {
                 
             case .neonGlow:
                 let borderLayer = CALayer()
-                let bWidth = max(5.0, frame.borderWidth * widthRatio)
-                let cRadius = frame.cornerRadius * widthRatio
+                let bWidth = max(5.0, effectiveBorderWidth * widthRatio)
+                let cRadius = effectiveCornerRadius * widthRatio
                 borderLayer.frame = CGRect(origin: .zero, size: videoSize)
-                borderLayer.borderColor = frame.borderColor.cgColor
+                borderLayer.borderColor = frameColor.cgColor
                 borderLayer.borderWidth = bWidth
                 borderLayer.cornerRadius = cRadius
-                borderLayer.shadowColor = frame.borderColor.cgColor
+                borderLayer.shadowColor = frameColor.cgColor
                 borderLayer.shadowRadius = 15.0 * widthRatio
                 borderLayer.shadowOpacity = 0.9
                 borderLayer.shadowOffset = .zero
@@ -142,9 +150,9 @@ final class VideoExporter {
                 
             case .vintage:
                 let borderLayer = CALayer()
-                let bWidth = max(6.0, frame.borderWidth * widthRatio)
+                let bWidth = max(6.0, effectiveBorderWidth * widthRatio)
                 borderLayer.frame = CGRect(origin: .zero, size: videoSize)
-                borderLayer.borderColor = frame.borderColor.cgColor
+                borderLayer.borderColor = frameColor.cgColor
                 borderLayer.borderWidth = bWidth
                 overlayLayer.addSublayer(borderLayer)
                 
@@ -163,34 +171,88 @@ final class VideoExporter {
             case .newsBroadcast:
                 let borderLayer = CALayer()
                 borderLayer.frame = CGRect(origin: .zero, size: videoSize)
-                borderLayer.borderColor = UIColor.systemRed.cgColor
-                borderLayer.borderWidth = max(6.0, 8.0 * widthRatio)
+                borderLayer.borderColor = (customFrameColor ?? UIColor.systemRed).cgColor
+                borderLayer.borderWidth = max(6.0, effectiveBorderWidth * widthRatio)
                 overlayLayer.addSublayer(borderLayer)
                 
                 let topBar = CALayer()
                 topBar.frame = CGRect(x: 0, y: videoSize.height - (32.0 * widthRatio), width: videoSize.width, height: 32.0 * widthRatio)
-                topBar.backgroundColor = UIColor.systemRed.cgColor
+                topBar.backgroundColor = (customFrameColor ?? UIColor.systemRed).cgColor
                 overlayLayer.addSublayer(topBar)
                 
             case .sportsBroadcast:
+                let sportsColor = customFrameColor ?? UIColor(red: 0.1, green: 0.2, blue: 0.5, alpha: 1.0)
                 let borderLayer = CALayer()
                 borderLayer.frame = CGRect(origin: .zero, size: videoSize)
-                borderLayer.borderColor = UIColor(red: 0.1, green: 0.2, blue: 0.5, alpha: 1.0).cgColor
-                borderLayer.borderWidth = max(6.0, 8.0 * widthRatio)
+                borderLayer.borderColor = sportsColor.cgColor
+                borderLayer.borderWidth = max(6.0, effectiveBorderWidth * widthRatio)
                 overlayLayer.addSublayer(borderLayer)
                 
                 let topBar = CALayer()
                 topBar.frame = CGRect(x: 0, y: videoSize.height - (30.0 * widthRatio), width: videoSize.width, height: 30.0 * widthRatio)
-                topBar.backgroundColor = UIColor(red: 0.1, green: 0.2, blue: 0.5, alpha: 1.0).cgColor
+                topBar.backgroundColor = sportsColor.cgColor
                 overlayLayer.addSublayer(topBar)
                 
             case .podcastShow:
+                let podcastColor = customFrameColor ?? UIColor(red: 0.4, green: 0.1, blue: 0.6, alpha: 1.0)
                 let borderLayer = CALayer()
                 borderLayer.frame = CGRect(origin: .zero, size: videoSize)
-                borderLayer.borderColor = UIColor(red: 0.4, green: 0.1, blue: 0.6, alpha: 1.0).cgColor
-                borderLayer.borderWidth = max(6.0, 8.0 * widthRatio)
+                borderLayer.borderColor = podcastColor.cgColor
+                borderLayer.borderWidth = max(6.0, effectiveBorderWidth * widthRatio)
                 borderLayer.cornerRadius = 16.0 * widthRatio
                 overlayLayer.addSublayer(borderLayer)
+                
+            case .minimal:
+                let borderLayer = CALayer()
+                borderLayer.frame = CGRect(origin: .zero, size: videoSize)
+                borderLayer.borderColor = frameColor.cgColor
+                borderLayer.borderWidth = max(3.0, effectiveBorderWidth * widthRatio)
+                borderLayer.cornerRadius = effectiveCornerRadius * widthRatio
+                overlayLayer.addSublayer(borderLayer)
+                
+            case .gradient:
+                let borderLayer = CALayer()
+                borderLayer.frame = CGRect(origin: .zero, size: videoSize)
+                borderLayer.borderColor = frameColor.cgColor
+                borderLayer.borderWidth = max(6.0, effectiveBorderWidth * widthRatio)
+                borderLayer.cornerRadius = effectiveCornerRadius * widthRatio
+                borderLayer.shadowColor = UIColor.systemPink.cgColor
+                borderLayer.shadowRadius = 12.0 * widthRatio
+                borderLayer.shadowOpacity = 0.8
+                overlayLayer.addSublayer(borderLayer)
+                
+            case .filmStrip:
+                let barWidth = 14.0 * widthRatio
+                let leftBar = CALayer()
+                leftBar.frame = CGRect(x: 0, y: 0, width: barWidth, height: videoSize.height)
+                leftBar.backgroundColor = UIColor.black.cgColor
+                overlayLayer.addSublayer(leftBar)
+                
+                let rightBar = CALayer()
+                rightBar.frame = CGRect(x: videoSize.width - barWidth, y: 0, width: barWidth, height: videoSize.height)
+                rightBar.backgroundColor = UIColor.black.cgColor
+                overlayLayer.addSublayer(rightBar)
+                
+            case .glitch:
+                let borderLayer = CALayer()
+                borderLayer.frame = CGRect(origin: .zero, size: videoSize)
+                borderLayer.borderColor = frameColor.cgColor
+                borderLayer.borderWidth = max(4.0, effectiveBorderWidth * widthRatio)
+                borderLayer.cornerRadius = effectiveCornerRadius * widthRatio
+                overlayLayer.addSublayer(borderLayer)
+                
+            case .splitDual:
+                let borderLayer = CALayer()
+                borderLayer.frame = CGRect(origin: .zero, size: videoSize)
+                borderLayer.borderColor = frameColor.cgColor
+                borderLayer.borderWidth = max(4.0, effectiveBorderWidth * widthRatio)
+                overlayLayer.addSublayer(borderLayer)
+                
+                let splitLine = CALayer()
+                let midX = videoSize.width / 2.0
+                splitLine.frame = CGRect(x: midX - 2.0, y: 0, width: 4.0, height: videoSize.height)
+                splitLine.backgroundColor = frameColor.cgColor
+                overlayLayer.addSublayer(splitLine)
             }
         }
         
@@ -210,14 +272,50 @@ final class VideoExporter {
                 iconLayer.contentsGravity = .resizeAspect
                 
                 let logoSize = min(videoSize.width, videoSize.height) * 0.18
-                let padding = logoSize * 0.3
+                let posX = logoPositionRatio.x * (videoSize.width - logoSize)
+                let posY = videoSize.height - logoSize - (logoPositionRatio.y * (videoSize.height - logoSize))
                 
                 iconLayer.frame = CGRect(
-                    x: padding,
-                    y: videoSize.height - logoSize - padding,
+                    x: max(0, min(videoSize.width - logoSize, posX)),
+                    y: max(0, min(videoSize.height - logoSize, posY)),
                     width: logoSize,
                     height: logoSize
                 )
+                
+                // Shape Masking
+                switch logoShape {
+                case .square:
+                    break
+                case .circle:
+                    iconLayer.cornerRadius = logoSize / 2.0
+                    iconLayer.masksToBounds = true
+                case .roundedSquare:
+                    iconLayer.cornerRadius = logoSize * 0.2
+                    iconLayer.masksToBounds = true
+                case .hexagon, .diamond:
+                    let shapeMask = CAShapeLayer()
+                    let rect = CGRect(origin: .zero, size: CGSize(width: logoSize, height: logoSize))
+                    let path = UIBezierPath()
+                    if logoShape == .diamond {
+                        path.move(to: CGPoint(x: rect.midX, y: 0))
+                        path.addLine(to: CGPoint(x: rect.maxX, y: rect.midY))
+                        path.addLine(to: CGPoint(x: rect.midX, y: rect.maxY))
+                        path.addLine(to: CGPoint(x: 0, y: rect.midY))
+                        path.close()
+                    } else { // hexagon
+                        let side = logoSize / 2.0
+                        path.move(to: CGPoint(x: rect.midX, y: 0))
+                        path.addLine(to: CGPoint(x: rect.maxX, y: logoSize * 0.25))
+                        path.addLine(to: CGPoint(x: rect.maxX, y: logoSize * 0.75))
+                        path.addLine(to: CGPoint(x: rect.midX, y: rect.maxY))
+                        path.addLine(to: CGPoint(x: 0, y: logoSize * 0.75))
+                        path.addLine(to: CGPoint(x: 0, y: logoSize * 0.25))
+                        path.close()
+                    }
+                    shapeMask.path = path.cgPath
+                    iconLayer.mask = shapeMask
+                }
+                
                 overlayLayer.addSublayer(iconLayer)
             }
         }

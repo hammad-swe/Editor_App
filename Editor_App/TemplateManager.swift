@@ -42,6 +42,11 @@ enum FrameStyle: String, Codable {
     case newsBroadcast
     case sportsBroadcast
     case podcastShow
+    case minimal
+    case gradient
+    case filmStrip
+    case glitch
+    case splitDual
 }
 
 struct FrameTemplate: Equatable {
@@ -85,6 +90,14 @@ final class TemplateManager {
     
     // MARK: - Frame Templates
     
+    func allTemplates() -> [FrameTemplate] {
+        let builtIn = frameTemplates()
+        let customSaved = CustomTemplateStorage.shared.fetchAllTemplates().map {
+            CustomTemplateStorage.shared.convertToFrameTemplate($0)
+        }
+        return builtIn + customSaved
+    }
+    
     func frameTemplates() -> [FrameTemplate] {
         let playBadge = UIImage(systemName: "play.circle.fill")?.withTintColor(.systemRed, renderingMode: .alwaysOriginal)
         let starBadge = UIImage(systemName: "star.circle.fill")?.withTintColor(.systemYellow, renderingMode: .alwaysOriginal)
@@ -94,6 +107,8 @@ final class TemplateManager {
         let liveBadge = UIImage(systemName: "record.circle.fill")?.withTintColor(.systemRed, renderingMode: .alwaysOriginal)
         let trophyBadge = UIImage(systemName: "trophy.fill")?.withTintColor(.systemYellow, renderingMode: .alwaysOriginal)
         let flameBadge = UIImage(systemName: "flame.fill")?.withTintColor(.systemOrange, renderingMode: .alwaysOriginal)
+        let filmBadge = UIImage(systemName: "film.stack.fill")?.withTintColor(.systemIndigo, renderingMode: .alwaysOriginal)
+        let sparkleBadge = UIImage(systemName: "sparkles")?.withTintColor(.systemPink, renderingMode: .alwaysOriginal)
         let shapes1Img = UIImage(named: "shapes1")
         
         return [
@@ -185,6 +200,71 @@ final class TemplateManager {
                 defaultAspect: .ratio1_1,
                 defaultLogo: shapes1Img,
                 defaultHeadline: "SPECIAL EDITION • EXCLUSIVE STORY",
+                headlineStyle: .staticCentered,
+                isBuiltIn: true
+            ),
+            FrameTemplate(
+                id: "minimal_dark",
+                name: "Minimal Dark",
+                style: .minimal,
+                borderColor: UIColor.darkGray,
+                borderWidth: 3,
+                cornerRadius: 8,
+                defaultAspect: .ratio1_1,
+                defaultLogo: starBadge,
+                defaultHeadline: "MINIMAL DESIGN • CLEAN STYLE",
+                headlineStyle: .staticCentered,
+                isBuiltIn: true
+            ),
+            FrameTemplate(
+                id: "gradient_wave",
+                name: "Gradient Wave",
+                style: .gradient,
+                borderColor: .systemPurple,
+                borderWidth: 8,
+                cornerRadius: 14,
+                defaultAspect: .ratio9_16,
+                defaultLogo: sparkleBadge,
+                defaultHeadline: "VIBRANT GRADIENT • MODERN WAVE",
+                headlineStyle: .slidingTicker,
+                isBuiltIn: true
+            ),
+            FrameTemplate(
+                id: "film_strip",
+                name: "Film Strip",
+                style: .filmStrip,
+                borderColor: .black,
+                borderWidth: 14,
+                cornerRadius: 0,
+                defaultAspect: .ratio16_9,
+                defaultLogo: filmBadge,
+                defaultHeadline: "VINTAGE MOVIE • 35MM REEL",
+                headlineStyle: .staticCentered,
+                isBuiltIn: true
+            ),
+            FrameTemplate(
+                id: "glitch_art",
+                name: "Glitch Art",
+                style: .glitch,
+                borderColor: .systemPink,
+                borderWidth: 6,
+                cornerRadius: 4,
+                defaultAspect: .ratio9_16,
+                defaultLogo: flameBadge,
+                defaultHeadline: "CYBER GLITCH • RETRO WAVE",
+                headlineStyle: .slidingTicker,
+                isBuiltIn: true
+            ),
+            FrameTemplate(
+                id: "split_dual",
+                name: "Split Dual",
+                style: .splitDual,
+                borderColor: .systemTeal,
+                borderWidth: 6,
+                cornerRadius: 0,
+                defaultAspect: .ratio16_9,
+                defaultLogo: sealBadge,
+                defaultHeadline: "DUAL VIEW • SPLIT HIGHLIGHTS",
                 headlineStyle: .staticCentered,
                 isBuiltIn: true
             )

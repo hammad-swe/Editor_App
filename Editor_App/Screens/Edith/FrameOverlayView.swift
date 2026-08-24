@@ -9,6 +9,13 @@ import UIKit
 
 class FrameOverlayView: UIView {
     
+    var customBorderColor: UIColor? {
+        didSet {
+            setNeedsLayout()
+            updateOverlay()
+        }
+    }
+    
     var template: FrameTemplate? {
         didSet {
             setNeedsLayout()
@@ -71,6 +78,7 @@ class FrameOverlayView: UIView {
             return
         }
         
+        let effectiveColor = customBorderColor ?? template.borderColor
         let scale = min(bounds.width, bounds.height) / 300.0
         let effectiveScale = max(0.5, scale)
         
@@ -79,7 +87,7 @@ class FrameOverlayView: UIView {
             break
             
         case .classic:
-            layer.borderColor = template.borderColor.cgColor
+            layer.borderColor = effectiveColor.cgColor
             layer.borderWidth = max(2.0, template.borderWidth * effectiveScale)
             layer.cornerRadius = 0
             
@@ -94,7 +102,7 @@ class FrameOverlayView: UIView {
             bottomBarView.frame = CGRect(x: 0, y: bounds.height - barHeight, width: bounds.width, height: barHeight)
             
         case .rounded:
-            layer.borderColor = template.borderColor.cgColor
+            layer.borderColor = effectiveColor.cgColor
             layer.borderWidth = max(2.0, template.borderWidth * effectiveScale)
             layer.cornerRadius = max(4.0, template.cornerRadius * effectiveScale)
             layer.masksToBounds = true
@@ -120,17 +128,17 @@ class FrameOverlayView: UIView {
             bottomBarView.frame = CGRect(x: 0, y: bounds.height - bottomHeight, width: bounds.width, height: bottomHeight)
             
         case .neonGlow:
-            layer.borderColor = template.borderColor.cgColor
+            layer.borderColor = effectiveColor.cgColor
             layer.borderWidth = max(2.0, template.borderWidth * effectiveScale)
             layer.cornerRadius = max(4.0, template.cornerRadius * effectiveScale)
-            layer.shadowColor = template.borderColor.cgColor
+            layer.shadowColor = effectiveColor.cgColor
             layer.shadowRadius = max(4.0, 10.0 * effectiveScale)
             layer.shadowOpacity = 0.95
             layer.shadowOffset = .zero
             layer.masksToBounds = false
             
         case .vintage:
-            layer.borderColor = template.borderColor.cgColor
+            layer.borderColor = effectiveColor.cgColor
             layer.borderWidth = max(2.0, template.borderWidth * effectiveScale)
             layer.cornerRadius = max(2.0, template.cornerRadius * effectiveScale)
             
@@ -142,12 +150,12 @@ class FrameOverlayView: UIView {
             innerBorderView.layer.borderWidth = max(1.0, 1.5 * effectiveScale)
             
         case .newsBroadcast:
-            layer.borderColor = UIColor.systemRed.cgColor
+            layer.borderColor = (customBorderColor ?? UIColor.systemRed).cgColor
             layer.borderWidth = max(3.0, 6.0 * effectiveScale)
             layer.cornerRadius = 0
             
             topBarView.isHidden = false
-            topBarView.backgroundColor = .systemRed
+            topBarView.backgroundColor = customBorderColor ?? .systemRed
             topBarView.frame = CGRect(x: 0, y: 0, width: bounds.width, height: max(16.0, 28.0 * effectiveScale))
             
             bottomBarView.isHidden = false
@@ -155,12 +163,13 @@ class FrameOverlayView: UIView {
             bottomBarView.frame = CGRect(x: 0, y: bounds.height - max(20.0, 36.0 * effectiveScale), width: bounds.width, height: max(20.0, 36.0 * effectiveScale))
             
         case .sportsBroadcast:
-            layer.borderColor = UIColor(red: 0.1, green: 0.2, blue: 0.5, alpha: 1.0).cgColor
+            let sportsColor = customBorderColor ?? UIColor(red: 0.1, green: 0.2, blue: 0.5, alpha: 1.0)
+            layer.borderColor = sportsColor.cgColor
             layer.borderWidth = max(3.0, 6.0 * effectiveScale)
             layer.cornerRadius = 0
             
             topBarView.isHidden = false
-            topBarView.backgroundColor = UIColor(red: 0.1, green: 0.2, blue: 0.5, alpha: 1.0)
+            topBarView.backgroundColor = sportsColor
             topBarView.frame = CGRect(x: 0, y: 0, width: bounds.width, height: max(16.0, 26.0 * effectiveScale))
             
             bottomBarView.isHidden = false
@@ -168,7 +177,8 @@ class FrameOverlayView: UIView {
             bottomBarView.frame = CGRect(x: 0, y: bounds.height - max(18.0, 32.0 * effectiveScale), width: bounds.width, height: max(18.0, 32.0 * effectiveScale))
             
         case .podcastShow:
-            layer.borderColor = UIColor(red: 0.4, green: 0.1, blue: 0.6, alpha: 1.0).cgColor
+            let podcastColor = customBorderColor ?? UIColor(red: 0.4, green: 0.1, blue: 0.6, alpha: 1.0)
+            layer.borderColor = podcastColor.cgColor
             layer.borderWidth = max(3.0, 6.0 * effectiveScale)
             layer.cornerRadius = max(6.0, 16.0 * effectiveScale)
             layer.masksToBounds = true
@@ -176,6 +186,60 @@ class FrameOverlayView: UIView {
             bottomBarView.isHidden = false
             bottomBarView.backgroundColor = UIColor(red: 0.2, green: 0.05, blue: 0.35, alpha: 0.85)
             bottomBarView.frame = CGRect(x: 0, y: bounds.height - max(20.0, 36.0 * effectiveScale), width: bounds.width, height: max(20.0, 36.0 * effectiveScale))
+            
+        case .minimal:
+            layer.borderColor = effectiveColor.cgColor
+            layer.borderWidth = max(2.0, (template.borderWidth) * effectiveScale)
+            layer.cornerRadius = max(4.0, template.cornerRadius * effectiveScale)
+            layer.shadowColor = UIColor.black.cgColor
+            layer.shadowRadius = 4.0
+            layer.shadowOpacity = 0.5
+            layer.shadowOffset = CGSize(width: 0, height: 2)
+            layer.masksToBounds = false
+            
+        case .gradient:
+            layer.borderColor = effectiveColor.cgColor
+            layer.borderWidth = max(3.0, template.borderWidth * effectiveScale)
+            layer.cornerRadius = max(6.0, template.cornerRadius * effectiveScale)
+            layer.shadowColor = UIColor.systemPink.cgColor
+            layer.shadowRadius = 8.0
+            layer.shadowOpacity = 0.7
+            layer.shadowOffset = .zero
+            layer.masksToBounds = false
+            
+        case .filmStrip:
+            let barWidth = max(8.0, 14.0 * effectiveScale)
+            leftBarView.isHidden = false
+            leftBarView.backgroundColor = .black
+            leftBarView.frame = CGRect(x: 0, y: 0, width: barWidth, height: bounds.height)
+            
+            rightBarView.isHidden = false
+            rightBarView.backgroundColor = .black
+            rightBarView.frame = CGRect(x: bounds.width - barWidth, y: 0, width: barWidth, height: bounds.height)
+            
+            layer.borderColor = UIColor.black.cgColor
+            layer.borderWidth = max(2.0, 4.0 * effectiveScale)
+            
+        case .glitch:
+            layer.borderColor = effectiveColor.cgColor
+            layer.borderWidth = max(2.0, template.borderWidth * effectiveScale)
+            layer.cornerRadius = max(2.0, template.cornerRadius * effectiveScale)
+            
+            innerBorderView.isHidden = false
+            let inset = max(2.0, 3.0 * effectiveScale)
+            innerBorderView.frame = bounds.insetBy(dx: inset, dy: inset)
+            innerBorderView.layer.borderColor = UIColor.systemCyan.cgColor
+            innerBorderView.layer.borderWidth = max(1.5, 2.0 * effectiveScale)
+            
+        case .splitDual:
+            layer.borderColor = effectiveColor.cgColor
+            layer.borderWidth = max(3.0, template.borderWidth * effectiveScale)
+            
+            innerBorderView.isHidden = false
+            let midX = bounds.width / 2.0
+            innerBorderView.frame = CGRect(x: midX - 1.0, y: 0, width: 2.0, height: bounds.height)
+            innerBorderView.backgroundColor = effectiveColor
+            innerBorderView.layer.borderWidth = 0
         }
     }
 }

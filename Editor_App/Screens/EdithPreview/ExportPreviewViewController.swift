@@ -17,6 +17,7 @@ class ExportPreviewViewController: UIViewController {
 
     var exportedVideoURL: URL!
     var headlineText: String?
+    var coverImage: UIImage?
 
     private var player: AVPlayer!
     private var playerLayer: AVPlayerLayer!
@@ -27,6 +28,11 @@ class ExportPreviewViewController: UIViewController {
         setupPlayer()
         setupNavButtons()
         setupButtonsUI()
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(false, animated: animated)
     }
 
     override func viewDidLayoutSubviews() {
@@ -85,24 +91,11 @@ class ExportPreviewViewController: UIViewController {
     }
 
     @IBAction func saveProjectTapped(_ sender: UIButton) {
-        let spinner = UIActivityIndicatorView(style: .large)
-        spinner.center = view.center
-        spinner.startAnimating()
-        view.addSubview(spinner)
-
-        CoreDataManager.shared.saveProject(
-            exportedVideoURL: exportedVideoURL,
-            headlineText: headlineText
-        ) { [weak self] success in
-            spinner.stopAnimating()
-            spinner.removeFromSuperview()
-
-            if success {
-                self?.showAlertAndNavigateToDashboard("Project saved successfully to local storage!")
-            } else {
-                self?.showAlert("Could not save project to local storage.")
-            }
-        }
+        let saveProgressVC = SaveProgressViewController(nibName: "SaveProgressViewController", bundle: nil)
+        saveProgressVC.exportedVideoURL = exportedVideoURL
+        saveProgressVC.headlineText = headlineText
+        saveProgressVC.coverImage = coverImage
+        navigationController?.pushViewController(saveProgressVC, animated: true)
     }
 
     @IBAction func exportGalleryTapped(_ sender: UIButton) {

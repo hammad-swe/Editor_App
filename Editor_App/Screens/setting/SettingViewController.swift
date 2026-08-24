@@ -21,6 +21,7 @@ class SettingViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(false, animated: animated)
         projectCount = CoreDataManager.shared.fetchAllProjects().count
         tableView.reloadData()
     }
@@ -134,28 +135,47 @@ class SettingViewController: UIViewController {
         
         tableView.tableFooterView = footerView
     }
+    
+    @objc private func themeSegmentChanged(_ sender: UISegmentedControl) {
+        let selectedMode = sender.selectedSegmentIndex // 0: System, 1: Light, 2: Dark
+        UserDefaults.standard.set(selectedMode, forKey: "appThemeMode")
+        
+        let style: UIUserInterfaceStyle
+        switch selectedMode {
+        case 1: style = .light
+        case 2: style = .dark
+        default: style = .unspecified
+        }
+        
+        UIApplication.shared.connectedScenes
+            .compactMap { ($0 as? UIWindowScene)?.windows }
+            .flatMap { $0 }
+            .forEach { $0.overrideUserInterfaceStyle = style }
+    }
 }
 
 extension SettingViewController: UITableViewDataSource, UITableViewDelegate {
 
     func numberOfSections(in tableView: UITableView) -> Int {
-        return 3
+        return 4
     }
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         switch section {
-        case 0: return 1 // My Projects
-        case 1: return 1 // Clear Cache
-        case 2: return 3 // App Version, Rate App, Privacy Policy
+        case 0: return 1 // Appearance
+        case 1: return 1 // My Projects
+        case 2: return 1 // Clear Cache
+        case 3: return 3 // App Version, Rate App, Privacy Policy
         default: return 0
         }
     }
 
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         switch section {
-        case 0: return "PROJECTS & STORAGE"
-        case 1: return "MEMORY & PERFORMANCE"
-        case 2: return "ABOUT EDITOR APP"
+        case 0: return "APPEARANCE"
+        case 1: return "PROJECTS & STORAGE"
+        case 2: return "MEMORY & PERFORMANCE"
+        case 3: return "ABOUT EDITOR APP"
         default: return nil
         }
     }
@@ -168,6 +188,28 @@ extension SettingViewController: UITableViewDataSource, UITableViewDelegate {
 
         switch (indexPath.section, indexPath.row) {
         case (0, 0):
+            let savedMode = UserDefaults.standard.integer(forKey: "appThemeMode")
+            let themeControl = UISegmentedControl(items: ["System", "Light", "Dark"])
+            themeControl.selectedSegmentIndex = savedMode
+            themeControl.selectedSegmentTintColor = .systemBlue
+            let normalAttrs: [NSAttributedString.Key: Any] = [.font: UIFont.systemFont(ofSize: 11, weight: .medium)]
+            let selectedAttrs: [NSAttributedString.Key: Any] = [.foregroundColor: UIColor.white, .font: UIFont.systemFont(ofSize: 11, weight: .bold)]
+            themeControl.setTitleTextAttributes(normalAttrs, for: .normal)
+            themeControl.setTitleTextAttributes(selectedAttrs, for: .selected)
+            themeControl.addTarget(self, action: #selector(themeSegmentChanged(_:)), for: .valueChanged)
+            themeControl.frame = CGRect(x: 0, y: 0, width: 170, height: 28)
+            
+            cell.configure(
+                title: "App Theme",
+                subtitle: "Choose Light or Dark mode",
+                value: nil,
+                systemIcon: "circle.righthalf.filled",
+                badgeColor: .systemPurple,
+                showDisclosure: false
+            )
+            cell.accessoryView = themeControl
+            
+        case (1, 0):
             let countText = projectCount == 1 ? "1 project stored" : "\(projectCount) projects stored"
             cell.configure(
                 title: "My Saved Projects",
@@ -177,8 +219,9 @@ extension SettingViewController: UITableViewDataSource, UITableViewDelegate {
                 badgeColor: .systemBlue,
                 showDisclosure: true
             )
+            cell.accessoryView = nil
             
-        case (1, 0):
+        case (2, 0):
             cell.configure(
                 title: "Clear Cache & Temp Files",
                 subtitle: "Free up temporary export storage",
@@ -187,8 +230,9 @@ extension SettingViewController: UITableViewDataSource, UITableViewDelegate {
                 badgeColor: .systemRed,
                 showDisclosure: false
             )
+            cell.accessoryView = nil
             
-        case (2, 0):
+        case (3, 0):
             cell.configure(
                 title: "App Version",
                 subtitle: "Latest release build",
@@ -197,8 +241,9 @@ extension SettingViewController: UITableViewDataSource, UITableViewDelegate {
                 badgeColor: .systemGray,
                 showDisclosure: false
             )
+            cell.accessoryView = nil
             
-        case (2, 1):
+        case (3, 1):
             cell.configure(
                 title: "Rate Editor App",
                 subtitle: "Support us on the App Store",
@@ -207,8 +252,9 @@ extension SettingViewController: UITableViewDataSource, UITableViewDelegate {
                 badgeColor: .systemOrange,
                 showDisclosure: true
             )
+            cell.accessoryView = nil
             
-        case (2, 2):
+        case (3, 2):
             cell.configure(
                 title: "Privacy Policy",
                 subtitle: "On-device processing & local storage",
@@ -217,6 +263,7 @@ extension SettingViewController: UITableViewDataSource, UITableViewDelegate {
                 badgeColor: .systemGreen,
                 showDisclosure: true
             )
+            cell.accessoryView = nil
             
         default:
             break
@@ -229,11 +276,11 @@ extension SettingViewController: UITableViewDataSource, UITableViewDelegate {
         tableView.deselectRow(at: indexPath, animated: true)
 
         switch (indexPath.section, indexPath.row) {
-        case (0, 0):
+        case (1, 0):
             let projectsVC = MyProjectsViewController(nibName: "MyProjectsViewController", bundle: nil)
             navigationController?.pushViewController(projectsVC, animated: true)
             
-        case (1, 0):
+        case (2, 0):
             CoreDataManager.shared.clearCache()
             let alert = UIAlertController(
                 title: "Cache Cleared",
@@ -243,7 +290,7 @@ extension SettingViewController: UITableViewDataSource, UITableViewDelegate {
             alert.addAction(UIAlertAction(title: "OK", style: .default))
             present(alert, animated: true)
             
-        case (2, 1):
+        case (3, 1):
             let alert = UIAlertController(
                 title: "Rate Editor App",
                 message: "Thank you for using Editor App! We appreciate your support and rating on the App Store.",
@@ -252,7 +299,7 @@ extension SettingViewController: UITableViewDataSource, UITableViewDelegate {
             alert.addAction(UIAlertAction(title: "OK", style: .default))
             present(alert, animated: true)
             
-        case (2, 2):
+        case (3, 2):
             let alert = UIAlertController(
                 title: "Privacy Policy",
                 message: "Your privacy is our top priority. All photos and videos remain 100% local on your device. We do not track, collect, or upload your media to any server.",

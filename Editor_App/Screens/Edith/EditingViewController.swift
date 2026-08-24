@@ -32,6 +32,11 @@ class EditingViewController: UIViewController {
         showStep(index: viewModel.currentStepIndex)
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(false, animated: animated)
+    }
+    
     private func setupContainerView() {
         containerView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(containerView)
@@ -97,6 +102,7 @@ class EditingViewController: UIViewController {
             let previewVC = ExportPreviewViewController(nibName: "ExportPreviewViewController", bundle: nil)
             previewVC.exportedVideoURL = outputURL
             previewVC.headlineText = self.viewModel.model.headlineText
+            previewVC.coverImage = self.viewModel.model.coverImage
             
             var viewControllers = self.navigationController?.viewControllers ?? []
             if let index = viewControllers.firstIndex(of: processingVC) {

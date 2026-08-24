@@ -16,6 +16,7 @@
                 <outlet property="sectionTitleLabel" destination="p8Z-0b-3mN" id="P8k-0l-9A0"/>
                 <outlet property="skipButton" destination="s8Z-0b-3mN" id="G8k-0i-6A0"/>
                 <outlet property="stepLabel" destination="riY-YU-E3O" id="H8k-0j-7A0"/>
+                <outlet property="videoContainerHeightConstraint" destination="c1Z-0a-1h0" id="H8k-0c-2d0"/>
                 <outlet property="videoContainerView" destination="c8Z-0a-1bO" id="V8k-0j-5A0"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
             </connections>
@@ -32,10 +33,10 @@
                     <nil key="highlightedColor"/>
                 </label>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="c8Z-0a-1bO" userLabel="VideoContainerView">
-                    <rect key="frame" x="16" y="96" width="361" height="280"/>
+                    <rect key="frame" x="16" y="96" width="361" height="320"/>
                     <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     <constraints>
-                        <constraint firstAttribute="height" constant="280" id="c1Z-0a-1h0"/>
+                        <constraint firstAttribute="height" constant="320" id="c1Z-0a-1h0"/>
                     </constraints>
                 </view>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="SELECT A FRAME STYLE" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="p8Z-0b-3mN">

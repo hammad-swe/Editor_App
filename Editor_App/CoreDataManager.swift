@@ -55,6 +55,7 @@ final class CoreDataManager {
         title: String? = nil,
         logoName: String? = nil,
         headlineText: String? = nil,
+        coverImage: UIImage? = nil,
         completion: @escaping (Bool) -> Void
     ) {
         DispatchQueue.global(qos: .userInitiated).async { [weak self] in
@@ -79,9 +80,9 @@ final class CoreDataManager {
                 return
             }
             
-            // 2. Generate and save thumbnail image
-            if let thumbnail = self.generateThumbnail(for: destVideoURL),
-               let jpegData = thumbnail.jpegData(compressionQuality: 0.8) {
+            // 2. Generate and save thumbnail image (use coverImage if provided)
+            let thumbnail = coverImage ?? self.generateThumbnail(for: destVideoURL)
+            if let thumbnail = thumbnail, let jpegData = thumbnail.jpegData(compressionQuality: 0.8) {
                 try? jpegData.write(to: destThumbURL)
             }
             
