@@ -6,123 +6,170 @@
 //
 
 import UIKit
-import AVFoundation
 
+/// Coordinator container for multi-step video editing wizard
 class EditingViewController: UIViewController {
     
-    @IBOutlet weak var playerContainerView: UIView!
-    @IBOutlet weak var iconImageView: UIImageView!
-    @IBOutlet weak var headlineLabel: UILabel!
-    
     var videoURL: URL!
-    private var player: AVPlayer!
-        private var playerLayer: AVPlayerLayer!
-        
-        var watermarkIcon: UIImage = UIImage(named: "shapes1")!
-        var headlineText: String = "Wellcome to New Video"
+    var viewModel: VideoEditingViewModel!
+    
+    private var currentStepVC: UIViewController?
+    private let containerView = UIView()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-               title = "Edit"
-        setupPlayer()
-                setupOverlays()
-                setupExportButton()
+        view.backgroundColor = .systemBackground
+        title = "Edit Video"
         
-    }
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        playerLayer?.frame = playerContainerView.bounds
+        if viewModel == nil {
+            guard let videoURL = videoURL else {
+                fatalError("videoURL or viewModel must be provided")
+            }
+            viewModel = VideoEditingViewModel(videoURL: videoURL)
+        }
+        
+        setupContainerView()
+        setupNavigationBar()
+        showStep(index: viewModel.currentStepIndex)
     }
     
-    private func setupPlayer() {
-        player = AVPlayer(url: videoURL)
-        playerLayer = AVPlayerLayer(player: player)
-        playerLayer.frame = playerContainerView.bounds
-        playerLayer.videoGravity = .resizeAspect
-        playerContainerView.layer.insertSublayer(playerLayer, at: 0)
-        player.play()
-        
-        NotificationCenter.default.addObserver(
-            self, selector: #selector(loopVideo),
-            name: .AVPlayerItemDidPlayToEndTime, object: player.currentItem
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(false, animated: animated)
+    }
+    
+    private func setupNavigationBar() {
+        let audioBtn = UIBarButtonItem(
+            title: "🎵 Audio",
+            style: .plain,
+            target: self,
+            action: #selector(audioManagerTapped)
         )
+        navigationItem.rightBarButtonItem = audioBtn
+    }
+
+    @objc private func audioManagerTapped() {
+        let audioVC = AudioManagerViewController(nibName: "AudioManagerViewController", bundle: nil)
+        audioVC.viewModel = viewModel
+        present(audioVC, animated: true)
     }
     
-    @objc private func loopVideo() {
-        player.seek(to: .zero)
-        player.play()
-    }
-    
-    private func setupOverlays() {
-        iconImageView.image = watermarkIcon
-        iconImageView.tintColor = .white
-        iconImageView.isUserInteractionEnabled = true
-        addDragGesture(to: iconImageView)
+    private func setupContainerView() {
+        containerView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(containerView)
         
-        headlineLabel.text = headlineText
-        headlineLabel.sizeToFit()
-        startMarquee()
+        NSLayoutConstraint.activate([
+            containerView.topAnchor.constraint(equalTo: view.topAnchor),
+            containerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            containerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            containerView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ])
     }
     
-    private func addDragGesture(to viewToDrag: UIView) {
-        let pan = UIPanGestureRecognizer(target: self, action: #selector(handleDrag(_:)))
-        viewToDrag.addGestureRecognizer(pan)
-    }
-    
-    @objc private func handleDrag(_ gesture: UIPanGestureRecognizer) {
-        guard let draggedView = gesture.view else { return }
-        let translation = gesture.translation(in: view)
-        draggedView.center = CGPoint(x: draggedView.center.x + translation.x, y: draggedView.center.y + translation.y)
-        gesture.setTranslation(.zero, in: view)
-    }
-    
-    private func startMarquee() {
-        let animation = CABasicAnimation(keyPath: "position.x")
-        animation.fromValue = view.bounds.width + headlineLabel.bounds.width / 2
-        animation.toValue = -headlineLabel.bounds.width / 2
-        animation.duration = 6.0
-        animation.repeatCount = .infinity
-        headlineLabel.layer.add(animation, forKey: "marquee")
-    }
-    
-    private func setupExportButton() {
-        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Export", style: .done, target: self, action: #selector(exportTapped))
-    }
-    
-    @objc private func exportTapped() {
-        let spinner = UIActivityIndicatorView(style: .large)
-        spinner.center = view.center
-        spinner.startAnimating()
-        view.addSubview(spinner)
-        navigationItem.rightBarButtonItem?.isEnabled = false
+    private func showStep(index: Int) {
+        // Remove current step VC
+        if let current = currentStepVC {
+            current.willMove(toParent: nil)
+            current.view.removeFromSuperview()
+            current.removeFromParent()
+        }
         
-        VideoExporter.shared.export(
-            videoURL: videoURL,
-            icon: watermarkIcon,
-            iconFrame: iconImageView.frame,
-            headlineText: headlineText,
-            headlineFont: headlineLabel.font,
-            previewBounds: playerContainerView.bounds
-        ) { [weak self] outputURL in
-            spinner.stopAnimating()
-            spinner.removeFromSuperview()
-            self?.navigationItem.rightBarButtonItem?.isEnabled = true
+        let newStepVC: EditorStepViewController
+        switch index {
+        case 0:
+            let cutVC = VideoCutSplitViewController(nibName: "VideoCutSplitViewController", bundle: nil)
+            cutVC.viewModel = viewModel
+            newStepVC = cutVC
+        case 1:
+            let cropVC = CropRotateViewController(nibName: "CropRotateViewController", bundle: nil)
+            cropVC.viewModel = viewModel
+            newStepVC = cropVC
+        case 2:
+            let frameVC = FrameTemplatesViewController(nibName: "FrameTemplatesViewController", bundle: nil)
+            frameVC.viewModel = viewModel
+            newStepVC = frameVC
+        case 3:
+            let logoVC = AddLogoStepViewController(nibName: "AddLogoStepViewController", bundle: nil)
+            logoVC.viewModel = viewModel
+            newStepVC = logoVC
+        case 4:
+            let textVC = AddTextStepViewController(nibName: "AddTextStepViewController", bundle: nil)
+            textVC.viewModel = viewModel
+            newStepVC = textVC
+        default:
+            return
+        }
+        
+        newStepVC.stepDelegate = self
+        addChild(newStepVC)
+        newStepVC.view.frame = containerView.bounds
+        newStepVC.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        containerView.addSubview(newStepVC.view)
+        newStepVC.didMove(toParent: self)
+        
+        currentStepVC = newStepVC
+    }
+    
+    private func processAndPreviewVideo() {
+        let processingVC = ProcessingViewController(nibName: "ProcessingViewController", bundle: nil)
+        processingVC.viewModel = viewModel
+        processingVC.onComplete = { [weak self] outputURL in
+            guard let self = self else { return }
             
             guard let outputURL = outputURL else {
-                self?.showAlert("Export failed. Try again.")
+                self.navigationController?.popViewController(animated: true)
+                let alert = UIAlertController(title: "Export Failed", message: "Could not process video. Please try again.", preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "OK", style: .default))
+                self.present(alert, animated: true)
                 return
             }
             
             let previewVC = ExportPreviewViewController(nibName: "ExportPreviewViewController", bundle: nil)
             previewVC.exportedVideoURL = outputURL
-            self?.navigationController?.pushViewController(previewVC, animated: true)
+            previewVC.headlineText = self.viewModel.model.headlineText
+            previewVC.coverImage = self.viewModel.model.coverImage
+            
+            var viewControllers = self.navigationController?.viewControllers ?? []
+            if let index = viewControllers.firstIndex(of: processingVC) {
+                viewControllers[index] = previewVC
+                self.navigationController?.setViewControllers(viewControllers, animated: true)
+            } else {
+                self.navigationController?.pushViewController(previewVC, animated: true)
+            }
         }
-    }
-    
-    private func showAlert(_ message: String) {
-        let alert = UIAlertController(title: "Error", message: message, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "OK", style: .default))
-        present(alert, animated: true)
+        
+        navigationController?.pushViewController(processingVC, animated: true)
     }
 }
 
+// MARK: - EditorStepDelegate
+
+extension EditingViewController: EditorStepDelegate {
+    
+    func stepDidTapNext(_ step: UIViewController) {
+        if viewModel.isLastStep {
+            processAndPreviewVideo()
+        } else {
+            _ = viewModel.nextStep()
+            showStep(index: viewModel.currentStepIndex)
+        }
+    }
+    
+    func stepDidTapSkip(_ step: UIViewController) {
+        if viewModel.isLastStep {
+            processAndPreviewVideo()
+        } else {
+            _ = viewModel.nextStep()
+            showStep(index: viewModel.currentStepIndex)
+        }
+    }
+    
+    func stepDidTapBack(_ step: UIViewController) {
+        if viewModel.isFirstStep {
+            navigationController?.popViewController(animated: true)
+        } else {
+            _ = viewModel.previousStep()
+            showStep(index: viewModel.currentStepIndex)
+        }
+    }
+}

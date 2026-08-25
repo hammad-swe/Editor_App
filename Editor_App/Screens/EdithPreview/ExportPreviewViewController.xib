@@ -10,7 +10,9 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="ExportPreviewViewController" customModule="Editor_App" customModuleProvider="target">
             <connections>
+                <outlet property="exportGalleryButton" destination="x8Z-0b-3mN" id="D8k-0f-4A0"/>
                 <outlet property="playerContainerView" destination="Phi-tq-NTN" id="Uyw-Qb-m5s"/>
+                <outlet property="saveProjectButton" destination="u8B-m1-2nO" id="C8k-0e-4A0"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
             </connections>
         </placeholder>
@@ -19,27 +21,71 @@
             <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Phi-tq-NTN">
-                    <rect key="frame" x="0.0" y="118" width="393" height="500"/>
-                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Phi-tq-NTN" userLabel="PlayerContainerView">
+                    <rect key="frame" x="20" y="83" width="353" height="380"/>
+                    <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     <constraints>
-                        <constraint firstAttribute="height" constant="500" id="XkO-ke-KIm"/>
+                        <constraint firstAttribute="height" constant="380" id="XkO-ke-KIm"/>
                     </constraints>
                 </view>
+                <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="14" translatesAutoresizingMaskIntoConstraints="NO" id="b8Z-0c-4mN" userLabel="ActionStack">
+                    <rect key="frame" x="20" y="666" width="353" height="118"/>
+                    <subviews>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="u8B-m1-2nO" userLabel="SaveProjectButton">
+                            <rect key="frame" x="0.0" y="0.0" width="353" height="52"/>
+                            <color key="backgroundColor" systemColor="systemBlueColor"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="52" id="H8k-0a-1A0"/>
+                            </constraints>
+                            <fontDescription key="fontDescription" type="system" weight="bold" pointSize="16"/>
+                            <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                            <state key="normal" title="Save Project">
+                                <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            </state>
+                            <connections>
+                                <action selector="saveProjectTapped:" destination="-1" eventType="touchUpInside" id="M8k-0o-2A0"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="x8Z-0b-3mN" userLabel="ExportGalleryButton">
+                            <rect key="frame" x="0.0" y="66" width="353" height="52"/>
+                            <color key="backgroundColor" systemColor="systemGreenColor"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="52" id="H8k-0b-1A0"/>
+                            </constraints>
+                            <fontDescription key="fontDescription" type="system" weight="bold" pointSize="16"/>
+                            <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                            <state key="normal" title="Export to Photos">
+                                <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            </state>
+                            <connections>
+                                <action selector="exportGalleryTapped:" destination="-1" eventType="touchUpInside" id="O8k-0q-4A0"/>
+                            </connections>
+                        </button>
+                    </subviews>
+                </stackView>
             </subviews>
             <viewLayoutGuide key="safeArea" id="fnl-2z-Ty3"/>
-            <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+            <color key="backgroundColor" systemColor="systemGroupedBackgroundColor"/>
             <constraints>
-                <constraint firstItem="fnl-2z-Ty3" firstAttribute="trailing" secondItem="Phi-tq-NTN" secondAttribute="trailing" id="JVf-gy-dxL"/>
-                <constraint firstItem="Phi-tq-NTN" firstAttribute="top" secondItem="fnl-2z-Ty3" secondAttribute="top" id="eLz-Zq-bRd"/>
-                <constraint firstItem="Phi-tq-NTN" firstAttribute="leading" secondItem="fnl-2z-Ty3" secondAttribute="leading" id="fDe-Tf-qrL"/>
+                <constraint firstItem="Phi-tq-NTN" firstAttribute="top" secondItem="fnl-2z-Ty3" secondAttribute="top" constant="24" id="eLz-Zq-bRd"/>
+                <constraint firstItem="Phi-tq-NTN" firstAttribute="leading" secondItem="fnl-2z-Ty3" secondAttribute="leading" constant="20" id="fDe-Tf-qrL"/>
+                <constraint firstItem="fnl-2z-Ty3" firstAttribute="trailing" secondItem="Phi-tq-NTN" secondAttribute="trailing" constant="20" id="JVf-gy-dxL"/>
+                <constraint firstItem="fnl-2z-Ty3" firstAttribute="bottom" secondItem="b8Z-0c-4mN" secondAttribute="bottom" constant="34" id="g8Z-0d-1A0"/>
+                <constraint firstItem="b8Z-0c-4mN" firstAttribute="leading" secondItem="fnl-2z-Ty3" secondAttribute="leading" constant="20" id="h8Z-0e-1A0"/>
+                <constraint firstItem="fnl-2z-Ty3" firstAttribute="trailing" secondItem="b8Z-0c-4mN" secondAttribute="trailing" constant="20" id="i8Z-0f-1A0"/>
             </constraints>
             <point key="canvasLocation" x="-16" y="127"/>
         </view>
     </objects>
     <resources>
-        <systemColor name="systemBackgroundColor">
-            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        <systemColor name="systemGroupedBackgroundColor">
+            <color red="0.94901960784313721" green="0.94901960784313721" blue="0.96862745098039216" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+        <systemColor name="systemBlueColor">
+            <color red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+        <systemColor name="systemGreenColor">
+            <color red="0.20392156859999999" green="0.78039215689999997" blue="0.34901960780000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

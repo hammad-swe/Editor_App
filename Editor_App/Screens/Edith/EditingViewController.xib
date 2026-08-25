@@ -10,9 +10,6 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="EditingViewController" customModule="Editor_App" customModuleProvider="target">
             <connections>
-                <outlet property="headlineLabel" destination="7V9-FS-ver" id="joY-zD-qB0"/>
-                <outlet property="iconImageView" destination="iJb-aF-FJy" id="goy-af-TYu"/>
-                <outlet property="playerContainerView" destination="AIO-r4-Qne" id="XUt-vw-nDu"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
             </connections>
         </placeholder>
@@ -20,46 +17,8 @@
         <view clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="i5M-Pr-FkT">
             <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-            <subviews>
-                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="AIO-r4-Qne">
-                    <rect key="frame" x="0.0" y="118" width="393" height="392"/>
-                    <subviews>
-                        <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="iJb-aF-FJy">
-                            <rect key="frame" x="345" y="8" width="40" height="40"/>
-                            <constraints>
-                                <constraint firstAttribute="width" constant="40" id="v6A-cU-SUj"/>
-                                <constraint firstAttribute="height" constant="40" id="yPf-Pa-K9X"/>
-                            </constraints>
-                        </imageView>
-                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7V9-FS-ver">
-                            <rect key="frame" x="0.0" y="333" width="393" height="20"/>
-                            <constraints>
-                                <constraint firstAttribute="height" constant="20" id="vEN-Ju-j55"/>
-                            </constraints>
-                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                            <nil key="textColor"/>
-                            <nil key="highlightedColor"/>
-                        </label>
-                    </subviews>
-                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                    <constraints>
-                        <constraint firstItem="7V9-FS-ver" firstAttribute="leading" secondItem="AIO-r4-Qne" secondAttribute="leading" id="0Om-xD-vV5"/>
-                        <constraint firstItem="7V9-FS-ver" firstAttribute="top" secondItem="iJb-aF-FJy" secondAttribute="bottom" constant="285" id="6Zj-aL-dMT"/>
-                        <constraint firstAttribute="trailing" secondItem="iJb-aF-FJy" secondAttribute="trailing" constant="8" id="7lN-ZK-ZlT"/>
-                        <constraint firstItem="iJb-aF-FJy" firstAttribute="top" secondItem="AIO-r4-Qne" secondAttribute="top" constant="8" id="I53-76-Use"/>
-                        <constraint firstItem="iJb-aF-FJy" firstAttribute="leading" secondItem="AIO-r4-Qne" secondAttribute="leading" constant="345" id="PJR-Ef-Sg3"/>
-                        <constraint firstAttribute="trailing" secondItem="7V9-FS-ver" secondAttribute="trailing" id="Vnz-tF-9jx"/>
-                        <constraint firstAttribute="height" constant="392" id="ivf-uo-YUV"/>
-                    </constraints>
-                </view>
-            </subviews>
             <viewLayoutGuide key="safeArea" id="fnl-2z-Ty3"/>
             <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-            <constraints>
-                <constraint firstItem="AIO-r4-Qne" firstAttribute="top" secondItem="fnl-2z-Ty3" secondAttribute="top" id="oBz-Bz-ExP"/>
-                <constraint firstItem="AIO-r4-Qne" firstAttribute="trailing" secondItem="fnl-2z-Ty3" secondAttribute="trailing" id="uC6-aL-diZ"/>
-                <constraint firstItem="AIO-r4-Qne" firstAttribute="leading" secondItem="fnl-2z-Ty3" secondAttribute="leading" id="vCA-Cl-s1G"/>
-            </constraints>
             <point key="canvasLocation" x="-16.030534351145036" y="126.7605633802817"/>
         </view>
     </objects>

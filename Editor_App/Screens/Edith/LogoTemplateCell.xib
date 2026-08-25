@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="24765" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_12" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="24743"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="LogoTemplateCell" rowHeight="60" id="KGk-i7-Jjw" customClass="LogoTemplateCell" customModule="Editor_App" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="60"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
+                <rect key="frame" x="0.0" y="0.0" width="320" height="60"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="o8C-0a-4A0">
+                        <rect key="frame" x="16" y="10" width="40" height="40"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="40" id="7zX-X3-123"/>
+                            <constraint firstAttribute="width" constant="40" id="Q4f-9e-4A0"/>
+                        </constraints>
+                    </imageView>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Template Name" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="u8B-m1-2nO">
+                        <rect key="frame" x="68" y="19.666666666666668" width="196" height="21"/>
+                        <fontDescription key="fontDescription" type="system" weight="medium" pointSize="17"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="checkmark.circle.fill" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="x8Z-0b-3mN">
+                        <rect key="frame" x="280" y="19" width="24" height="22.666666666666671"/>
+                        <color key="tintColor" systemColor="systemBlueColor"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="24" id="9kY-9A-0zK"/>
+                            <constraint firstAttribute="height" constant="24" id="X8z-9m-1aN"/>
+                        </constraints>
+                    </imageView>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="o8C-0a-4A0" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="2kZ-0a-4A0"/>
+                    <constraint firstAttribute="trailing" secondItem="x8Z-0b-3mN" secondAttribute="trailing" constant="16" id="6mN-0A-1bO"/>
+                    <constraint firstItem="u8B-m1-2nO" firstAttribute="leading" secondItem="o8C-0a-4A0" secondAttribute="trailing" constant="14" id="7bN-0A-2bO"/>
+                    <constraint firstItem="o8C-0a-4A0" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="16" id="D8k-0A-3bO"/>
+                    <constraint firstItem="x8Z-0b-3mN" firstAttribute="leading" secondItem="u8B-m1-2nO" secondAttribute="trailing" constant="16" id="R8z-0B-4bO"/>
+                    <constraint firstItem="x8Z-0b-3mN" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="S8z-0C-5bO"/>
+                    <constraint firstItem="u8B-m1-2nO" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="W8z-0D-6bO"/>
+                </constraints>
+            </tableViewCellContentView>
+            <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
+            <connections>
+                <outlet property="checkmarkImageView" destination="x8Z-0b-3mN" id="C8k-0e-4A0"/>
+                <outlet property="logoImageView" destination="o8C-0a-4A0" id="D8k-0f-4A0"/>
+                <outlet property="nameLabel" destination="u8B-m1-2nO" id="E8k-0g-4A0"/>
+            </connections>
+            <point key="canvasLocation" x="139" y="20"/>
+        </tableViewCell>
+    </objects>
+    <resources>
+        <image name="checkmark.circle.fill" catalog="system" width="128" height="123"/>
+        <systemColor name="systemBlueColor">
+            <color red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+    </resources>
+</document>

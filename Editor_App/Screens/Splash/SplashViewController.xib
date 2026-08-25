@@ -4,13 +4,14 @@
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="24743"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
-        <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="SplashViewController" customModule="Editor_App" customModuleProvider="target">
             <connections>
+                <outlet property="appTitleLabel" destination="riY-YU-E3O" id="H8k-0j-7A0"/>
                 <outlet property="splashIcon" destination="6Q5-CK-km8" id="rav-Wf-RLu"/>
+                <outlet property="subtitleLabel" destination="p8Z-0b-3mN" id="P8k-0l-9A0"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
             </connections>
         </placeholder>
@@ -19,23 +20,43 @@
             <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="shapes1" translatesAutoresizingMaskIntoConstraints="NO" id="6Q5-CK-km8">
-                    <rect key="frame" x="132.66666666666666" y="362" width="127.99999999999997" height="128"/>
-                </imageView>
+                <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="center" spacing="16" translatesAutoresizingMaskIntoConstraints="NO" id="c8Z-0a-1bO">
+                    <rect key="frame" x="40" y="326" width="313" height="200"/>
+                    <subviews>
+                        <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="shapes1" translatesAutoresizingMaskIntoConstraints="NO" id="6Q5-CK-km8">
+                            <rect key="frame" x="106.66666666666666" y="0.0" width="100" height="100"/>
+                            <constraints>
+                                <constraint firstAttribute="width" constant="100" id="w1Z-0a-1h0"/>
+                                <constraint firstAttribute="height" constant="100" id="h1Z-0a-1h0"/>
+                            </constraints>
+                        </imageView>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Editor Studio Pro" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="riY-YU-E3O">
+                            <rect key="frame" x="38" y="116" width="237" height="36"/>
+                            <fontDescription key="fontDescription" type="boldSystem" pointSize="30"/>
+                            <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="BROADCAST VIDEO CREATOR" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="p8Z-0b-3mN">
+                            <rect key="frame" x="65" y="168" width="183" height="16"/>
+                            <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="13"/>
+                            <color key="textColor" red="0.6" green="0.7" blue="0.9" alpha="0.85" colorSpace="custom" customColorSpace="sRGB"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                    </subviews>
+                </stackView>
             </subviews>
             <viewLayoutGuide key="safeArea" id="fnl-2z-Ty3"/>
-            <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+            <color key="backgroundColor" red="0.05" green="0.08" blue="0.18" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
             <constraints>
-                <constraint firstItem="6Q5-CK-km8" firstAttribute="centerY" secondItem="i5M-Pr-FkT" secondAttribute="centerY" id="c7F-IK-Wbd"/>
-                <constraint firstItem="6Q5-CK-km8" firstAttribute="centerX" secondItem="i5M-Pr-FkT" secondAttribute="centerX" id="okn-aW-92R"/>
+                <constraint firstItem="c8Z-0a-1bO" firstAttribute="centerY" secondItem="i5M-Pr-FkT" secondAttribute="centerY" id="c7F-IK-Wbd"/>
+                <constraint firstItem="c8Z-0a-1bO" firstAttribute="centerX" secondItem="i5M-Pr-FkT" secondAttribute="centerX" id="okn-aW-92R"/>
+                <constraint firstItem="c8Z-0a-1bO" firstAttribute="leading" secondItem="fnl-2z-Ty3" secondAttribute="leading" constant="40" id="1l2-3m-4n5"/>
+                <constraint firstItem="fnl-2z-Ty3" firstAttribute="trailing" secondItem="c8Z-0a-1bO" secondAttribute="trailing" constant="40" id="2m3-4n-5o6"/>
             </constraints>
             <point key="canvasLocation" x="-16" y="127"/>
         </view>
     </objects>
     <resources>
         <image name="shapes1" width="128" height="128"/>
-        <systemColor name="systemBackgroundColor">
-            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-        </systemColor>
     </resources>
 </document>

@@ -21,6 +21,9 @@ class GalleryPickerViewController: UIViewController {
     private var collectionView: UICollectionView!
     private var selectedIndexPath: IndexPath?
     
+    private let bottomContainerView = UIView()
+    private let bottomNextButton = UIButton(type: .system)
+    
     private let cellID = "PickerCell"
     
     override func viewDidLoad() {
@@ -28,16 +31,29 @@ class GalleryPickerViewController: UIViewController {
         view.backgroundColor = .systemBackground
         title = filter == .photo ? "Select Photo" : "Select Video"
         
-        navigationItem.rightBarButtonItem = UIBarButtonItem(
-            image: UIImage(systemName: "checkmark"),
+        setupNavItems()
+        setupCollectionView()
+        setupBottomBar()
+        loadAssets()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(false, animated: animated)
+    }
+    
+    private func setupNavItems() {
+        let nextItem = UIBarButtonItem(
+            title: "Next",
             style: .done,
             target: self,
             action: #selector(tickTapped)
         )
-        navigationItem.rightBarButtonItem?.isEnabled = false
-        
-        setupCollectionView()
-        loadAssets()
+        let font = UIFont.systemFont(ofSize: 16, weight: .bold)
+        nextItem.setTitleTextAttributes([.font: font, .foregroundColor: UIColor.systemBlue], for: .normal)
+        nextItem.setTitleTextAttributes([.font: font, .foregroundColor: UIColor.systemGray3], for: .disabled)
+        nextItem.isEnabled = false
+        navigationItem.rightBarButtonItem = nextItem
     }
     
     private func setupCollectionView() {
@@ -50,13 +66,51 @@ class GalleryPickerViewController: UIViewController {
         layout.minimumInteritemSpacing = spacing
         layout.minimumLineSpacing = spacing
         
-        collectionView = UICollectionView(frame: view.bounds, collectionViewLayout: layout)
-        collectionView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.backgroundColor = .systemBackground
         collectionView.dataSource = self
         collectionView.delegate = self
         collectionView.register(PickerCell.self, forCellWithReuseIdentifier: cellID)
         view.addSubview(collectionView)
+    }
+    
+    private func setupBottomBar() {
+        bottomContainerView.translatesAutoresizingMaskIntoConstraints = false
+        bottomContainerView.backgroundColor = .secondarySystemGroupedBackground
+        bottomContainerView.layer.shadowColor = UIColor.black.cgColor
+        bottomContainerView.layer.shadowOpacity = 0.1
+        bottomContainerView.layer.shadowOffset = CGSize(width: 0, height: -2)
+        bottomContainerView.layer.shadowRadius = 8
+        view.addSubview(bottomContainerView)
+        
+        bottomNextButton.translatesAutoresizingMaskIntoConstraints = false
+        bottomNextButton.setTitle("Select & Edit Video  ›", for: .normal)
+        bottomNextButton.titleLabel?.font = .systemFont(ofSize: 16, weight: .bold)
+        bottomNextButton.setTitleColor(.white, for: .normal)
+        bottomNextButton.backgroundColor = .systemBlue
+        bottomNextButton.layer.cornerRadius = 12
+        bottomNextButton.isEnabled = false
+        bottomNextButton.alpha = 0.5
+        bottomNextButton.addTarget(self, action: #selector(tickTapped), for: .touchUpInside)
+        bottomContainerView.addSubview(bottomNextButton)
+        
+        NSLayoutConstraint.activate([
+            collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            collectionView.bottomAnchor.constraint(equalTo: bottomContainerView.topAnchor),
+            
+            bottomContainerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            bottomContainerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            bottomContainerView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            bottomContainerView.heightAnchor.constraint(equalToConstant: 90),
+            
+            bottomNextButton.topAnchor.constraint(equalTo: bottomContainerView.topAnchor, constant: 12),
+            bottomNextButton.leadingAnchor.constraint(equalTo: bottomContainerView.leadingAnchor, constant: 16),
+            bottomNextButton.trailingAnchor.constraint(equalTo: bottomContainerView.trailingAnchor, constant: -16),
+            bottomNextButton.heightAnchor.constraint(equalToConstant: 48)
+        ])
     }
     
     private func loadAssets() {
@@ -68,6 +122,13 @@ class GalleryPickerViewController: UIViewController {
         guard let indexPath = selectedIndexPath else { return }
         let asset = fetchResult.object(at: indexPath.item)
         delegate?.galleryPicker(self, didSelect: asset)
+    }
+    
+    private func updateSelectionState() {
+        let isSelected = (selectedIndexPath != nil)
+        navigationItem.rightBarButtonItem?.isEnabled = isSelected
+        bottomNextButton.isEnabled = isSelected
+        bottomNextButton.alpha = isSelected ? 1.0 : 0.5
     }
 }
 
@@ -87,13 +148,17 @@ extension GalleryPickerViewController: UICollectionViewDataSource {
 extension GalleryPickerViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let previous = selectedIndexPath
-        selectedIndexPath = (selectedIndexPath == indexPath) ? nil : indexPath
+        if selectedIndexPath == indexPath {
+            selectedIndexPath = nil
+        } else {
+            selectedIndexPath = indexPath
+        }
         
         var toReload = [indexPath]
         if let previous = previous { toReload.append(previous) }
         collectionView.reloadItems(at: toReload)
         
-        navigationItem.rightBarButtonItem?.isEnabled = (selectedIndexPath != nil)
+        updateSelectionState()
     }
 }
 
@@ -171,4 +236,3 @@ class PickerCell: UICollectionViewCell {
         }
     }
 }
-
