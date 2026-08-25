@@ -41,7 +41,7 @@ class AddTextStepViewController: UIViewController, EditorStepViewController {
     }
 
     private func setupUI() {
-        stepLabel.text = "Step 3 of \(viewModel?.totalSteps ?? 3): Add Headline Text"
+        stepLabel.text = "Step 5 of \(viewModel?.totalSteps ?? 5): Add Headline Text"
 
         textField.delegate = self
 

@@ -53,13 +53,34 @@ class SaveProgressViewController: UIViewController {
     }
 
     private func setupUI() {
-        thumbnailImageView.layer.cornerRadius = 12
+        // Thumbnail styling with glow shadow
+        thumbnailImageView.layer.cornerRadius = 16
         thumbnailImageView.clipsToBounds = true
         thumbnailImageView.backgroundColor = .black
+        thumbnailImageView.layer.borderWidth = 2.0
+        thumbnailImageView.layer.borderColor = UIColor.systemBlue.withAlphaComponent(0.3).cgColor
         
-        shareButton.layer.cornerRadius = 12
-        savePhotosButton.layer.cornerRadius = 12
-        doneButton.layer.cornerRadius = 12
+        // Button styling with icons and rounded corners
+        shareButton.layer.cornerRadius = 14
+        shareButton.backgroundColor = .systemPurple
+        shareButton.setTitle(" Share Video", for: .normal)
+        shareButton.setImage(UIImage(systemName: "square.and.arrow.up"), for: .normal)
+        shareButton.tintColor = .white
+        shareButton.titleLabel?.font = .systemFont(ofSize: 15, weight: .bold)
+        
+        savePhotosButton.layer.cornerRadius = 14
+        savePhotosButton.backgroundColor = .systemGreen
+        savePhotosButton.setTitle(" Save to Photos", for: .normal)
+        savePhotosButton.setImage(UIImage(systemName: "arrow.down.to.line.square"), for: .normal)
+        savePhotosButton.tintColor = .white
+        savePhotosButton.titleLabel?.font = .systemFont(ofSize: 15, weight: .bold)
+        
+        doneButton.layer.cornerRadius = 14
+        doneButton.backgroundColor = .systemBlue
+        doneButton.setTitle(" Go to Projects", for: .normal)
+        doneButton.setImage(UIImage(systemName: "checkmark.circle.fill"), for: .normal)
+        doneButton.tintColor = .white
+        doneButton.titleLabel?.font = .systemFont(ofSize: 15, weight: .bold)
         
         actionStackView.isHidden = true
         actionStackView.alpha = 0.0
@@ -67,11 +88,16 @@ class SaveProgressViewController: UIViewController {
         doneButton.alpha = 0.0
         
         statusLabel.text = "Rendering & Saving Project..."
+        statusLabel.font = .systemFont(ofSize: 15, weight: .bold)
+        statusLabel.textColor = .label
+        
+        percentageLabel.font = .systemFont(ofSize: 24, weight: .black)
+        percentageLabel.textColor = .systemBlue
         percentageLabel.text = "0%"
     }
     
     private func extractThumbnail() {
-        if let thumb = thumbnailImage {
+        if let thumb = coverImage ?? thumbnailImage {
             thumbnailImageView.image = thumb
             return
         }
@@ -146,7 +172,7 @@ class SaveProgressViewController: UIViewController {
     }
 
     @objc private func updateProgressAnimation() {
-        currentProgress += 0.02
+        currentProgress += 0.03
         if currentProgress >= 1.0 {
             currentProgress = 1.0
             displayLink?.invalidate()
@@ -164,6 +190,9 @@ class SaveProgressViewController: UIViewController {
         percentageLabel.text = "✓"
         percentageLabel.textColor = .systemGreen
         statusLabel.text = "Project Saved Successfully! 🎉"
+        statusLabel.textColor = .systemGreen
+        
+        thumbnailImageView.layer.borderColor = UIColor.systemGreen.cgColor
         
         UIView.animate(withDuration: 0.4) {
             self.actionStackView.isHidden = false

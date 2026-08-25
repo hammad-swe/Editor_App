@@ -45,7 +45,7 @@ class AddLogoStepViewController: UIViewController, EditorStepViewController {
     }
 
     private func setupUI() {
-        stepLabel.text = "Step 2 of \(viewModel?.totalSteps ?? 3): Add Logo to Video"
+        stepLabel.text = "Step 4 of \(viewModel?.totalSteps ?? 5): Add Logo to Video"
 
         if logoPreviewImageView != nil {
             logoPreviewImageView.layer.cornerRadius = 8

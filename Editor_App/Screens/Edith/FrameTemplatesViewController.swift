@@ -70,6 +70,7 @@ class FrameTemplatesViewController: UIViewController, EditorStepViewController {
         playerLayer?.frame = videoContainerView.bounds
         coverImageView.frame = videoContainerView.bounds
         frameOverlayView.frame = videoContainerView.bounds
+        viewModel?.applyModelTransforms(to: playerLayer)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -83,7 +84,7 @@ class FrameTemplatesViewController: UIViewController, EditorStepViewController {
     }
     
     private func setupUI() {
-        stepLabel.text = "Step 1 of \(viewModel?.totalSteps ?? 3): Choose Broadcast Template & Aspect Ratio"
+        stepLabel.text = "Step 3 of \(viewModel?.totalSteps ?? 5): Choose Frame Template"
         sectionTitleLabel.text = "SELECT BROADCAST TEMPLATE"
         
         // Video Container styling - Larger Default View
@@ -239,12 +240,36 @@ class FrameTemplatesViewController: UIViewController, EditorStepViewController {
             videoContainerHeightConstraint.constant = 320
         }
         
+        let containerW = videoContainerView.bounds.width > 0 ? videoContainerView.bounds.width : (view.bounds.width - 32.0)
+        let containerH: CGFloat = 320.0
+        
+        let targetRect: CGRect
+        if let targetRatio = ratio.ratioValue {
+            let containerAspect = containerW / containerH
+            var innerW: CGFloat = containerW
+            var innerH: CGFloat = containerH
+            
+            if containerAspect > targetRatio {
+                innerH = containerH
+                innerW = containerH * targetRatio
+            } else {
+                innerW = containerW
+                innerH = containerW / targetRatio
+            }
+            
+            let originX = (containerW - innerW) / 2.0
+            let originY = (containerH - innerH) / 2.0
+            targetRect = CGRect(x: originX, y: originY, width: innerW, height: innerH)
+        } else {
+            targetRect = CGRect(x: 0, y: 0, width: containerW, height: containerH)
+        }
+        
         UIView.animate(withDuration: 0.3, delay: 0, options: [.curveEaseInOut]) {
             self.view.layoutIfNeeded()
-            self.playerLayer?.frame = self.videoContainerView.bounds
+            self.playerLayer?.frame = targetRect
             self.playerLayer?.videoGravity = .resizeAspect
-            self.coverImageView.frame = self.videoContainerView.bounds
-            self.frameOverlayView.frame = self.videoContainerView.bounds
+            self.coverImageView.frame = targetRect
+            self.frameOverlayView.frame = targetRect
         }
     }
     
@@ -522,6 +547,21 @@ class FrameTemplatesViewController: UIViewController, EditorStepViewController {
         present(picker, animated: true)
     }
     
+    private func handleRotateTapped() {
+        viewModel.rotateVideoClockwise()
+        let degrees = viewModel.model.rotationDegrees
+        let radians = CGFloat(degrees) * .pi / 180.0
+        UIView.animate(withDuration: 0.3) {
+            self.playerLayer?.transform = CATransform3DMakeRotation(radians, 0, 0, 1)
+        }
+    }
+    
+    private func presentCropPicker() {
+        let cropOverlay = CropOverlayView(frame: videoContainerView.bounds)
+        cropOverlay.delegate = self
+        videoContainerView.addSubview(cropOverlay)
+    }
+    
     private func presentCustomizationSheet() {
         let sheetVC = FrameCustomizationSheetViewController()
         sheetVC.delegate = self
@@ -694,5 +734,20 @@ extension FrameTemplatesViewController: FrameCustomizationDelegate {
         selectedIndex = templates.count - 1
         updateSelectedTemplatePreview()
         collectionView.reloadData()
+    }
+}
+
+// MARK: - CropOverlayDelegate
+
+extension FrameTemplatesViewController: CropOverlayDelegate {
+    func cropOverlayDidFinish(normalizedCropRect: CGRect) {
+        viewModel?.setCropRect(normalizedCropRect)
+        playerLayer?.contentsRect = normalizedCropRect
+        player?.seek(to: .zero)
+        player?.play()
+    }
+    
+    func cropOverlayDidCancel() {
+        // Overlay dismissed without change
     }
 }

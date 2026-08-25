@@ -29,12 +29,29 @@ class EditingViewController: UIViewController {
         }
         
         setupContainerView()
+        setupNavigationBar()
         showStep(index: viewModel.currentStepIndex)
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(false, animated: animated)
+    }
+    
+    private func setupNavigationBar() {
+        let audioBtn = UIBarButtonItem(
+            title: "🎵 Audio",
+            style: .plain,
+            target: self,
+            action: #selector(audioManagerTapped)
+        )
+        navigationItem.rightBarButtonItem = audioBtn
+    }
+
+    @objc private func audioManagerTapped() {
+        let audioVC = AudioManagerViewController(nibName: "AudioManagerViewController", bundle: nil)
+        audioVC.viewModel = viewModel
+        present(audioVC, animated: true)
     }
     
     private func setupContainerView() {
@@ -60,14 +77,22 @@ class EditingViewController: UIViewController {
         let newStepVC: EditorStepViewController
         switch index {
         case 0:
+            let cutVC = VideoCutSplitViewController(nibName: "VideoCutSplitViewController", bundle: nil)
+            cutVC.viewModel = viewModel
+            newStepVC = cutVC
+        case 1:
+            let cropVC = CropRotateViewController(nibName: "CropRotateViewController", bundle: nil)
+            cropVC.viewModel = viewModel
+            newStepVC = cropVC
+        case 2:
             let frameVC = FrameTemplatesViewController(nibName: "FrameTemplatesViewController", bundle: nil)
             frameVC.viewModel = viewModel
             newStepVC = frameVC
-        case 1:
+        case 3:
             let logoVC = AddLogoStepViewController(nibName: "AddLogoStepViewController", bundle: nil)
             logoVC.viewModel = viewModel
             newStepVC = logoVC
-        case 2:
+        case 4:
             let textVC = AddTextStepViewController(nibName: "AddTextStepViewController", bundle: nil)
             textVC.viewModel = viewModel
             newStepVC = textVC

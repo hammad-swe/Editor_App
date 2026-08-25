@@ -12,13 +12,41 @@ final class VideoEditingViewModel {
     
     private(set) var model: VideoEditingModel
     var currentStepIndex: Int = 0
-    let totalSteps: Int = 3
+    let totalSteps: Int = 5
     
     var isFirstStep: Bool { currentStepIndex == 0 }
     var isLastStep: Bool { currentStepIndex == totalSteps - 1 }
     
     init(videoURL: URL) {
         self.model = VideoEditingModel(videoURL: videoURL)
+    }
+    
+    // MARK: - Transform & Crop Helpers
+    
+    func applyModelTransforms(to playerLayer: AVPlayerLayer?) {
+        guard let playerLayer = playerLayer else { return }
+        let degrees = model.rotationDegrees
+        let radians = CGFloat(degrees) * .pi / 180.0
+        playerLayer.transform = CATransform3DMakeRotation(radians, 0, 0, 1)
+        playerLayer.contentsRect = model.cropRect
+    }
+    
+    // MARK: - Video Cut & Split
+    
+    func setTrimRange(start: CMTime, end: CMTime?) {
+        model.trimStartTime = start
+        model.trimEndTime = end
+    }
+    
+    // MARK: - Audio Management
+    
+    func setMuteOriginalAudio(_ muted: Bool) {
+        model.muteOriginalAudio = muted
+    }
+    
+    func setReplacementAudio(url: URL?, volume: Float = 1.0) {
+        model.replacementAudioURL = url
+        model.replacementAudioVolume = volume
     }
     
     // MARK: - Frame Template Editing
@@ -65,6 +93,16 @@ final class VideoEditingViewModel {
     
     func setCustomCornerRadius(_ radius: CGFloat?) {
         model.customCornerRadius = radius
+    }
+    
+    // MARK: - Rotate & Crop Editing
+    
+    func rotateVideoClockwise() {
+        model.rotationDegrees = (model.rotationDegrees + 90) % 360
+    }
+    
+    func setCropRect(_ rect: CGRect) {
+        model.cropRect = rect
     }
     
     // MARK: - Headline Editing
@@ -118,8 +156,15 @@ final class VideoEditingViewModel {
             iconFrame: model.logoFrame,
             logoShape: model.logoShape,
             logoPositionRatio: model.logoPositionRatio,
+            rotationDegrees: model.rotationDegrees,
+            cropRect: model.cropRect,
             headlineText: model.headlineText,
             headlineFont: model.headlineFont,
+            trimStartTime: model.trimStartTime,
+            trimEndTime: model.trimEndTime,
+            muteOriginalAudio: model.muteOriginalAudio,
+            replacementAudioURL: model.replacementAudioURL,
+            replacementAudioVolume: model.replacementAudioVolume,
             previewBounds: previewBounds,
             completion: completion
         )

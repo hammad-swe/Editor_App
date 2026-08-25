@@ -24,8 +24,15 @@ final class VideoExporter {
         iconFrame: CGRect,
         logoShape: LogoShape = .square,
         logoPositionRatio: CGPoint = CGPoint(x: 0.05, y: 0.05),
-        headlineText: String?,
-        headlineFont: UIFont,
+        rotationDegrees: Int = 0,
+        cropRect: CGRect = CGRect(x: 0, y: 0, width: 1, height: 1),
+        headlineText: String? = nil,
+        headlineFont: UIFont = .systemFont(ofSize: 17, weight: .bold),
+        trimStartTime: CMTime = .zero,
+        trimEndTime: CMTime? = nil,
+        muteOriginalAudio: Bool = false,
+        replacementAudioURL: URL? = nil,
+        replacementAudioVolume: Float = 1.0,
         previewBounds: CGRect,
         completion: @escaping (URL?) -> Void
     ) {
@@ -40,13 +47,32 @@ final class VideoExporter {
             completion(nil); return
         }
         
+        let duration = trimEndTime ?? asset.duration
+        let exportDuration = CMTimeSubtract(duration, trimStartTime)
+        let timeRange = CMTimeRange(start: trimStartTime, duration: exportDuration)
+        
+        var audioMixParameters: [AVMutableAudioMixInputParameters] = []
+        
         do {
-            let range = CMTimeRange(start: .zero, duration: asset.duration)
-            try compVideoTrack.insertTimeRange(range, of: videoTrack, at: .zero)
+            try compVideoTrack.insertTimeRange(timeRange, of: videoTrack, at: .zero)
             
-            if let audioTrack = asset.tracks(withMediaType: .audio).first,
+            if !muteOriginalAudio, let audioTrack = asset.tracks(withMediaType: .audio).first,
                let compAudioTrack = composition.addMutableTrack(withMediaType: .audio, preferredTrackID: kCMPersistentTrackID_Invalid) {
-                try compAudioTrack.insertTimeRange(range, of: audioTrack, at: .zero)
+                try compAudioTrack.insertTimeRange(timeRange, of: audioTrack, at: .zero)
+            }
+            
+            if let replacementURL = replacementAudioURL {
+                let audioAsset = AVURLAsset(url: replacementURL)
+                if let newAudioTrack = audioAsset.tracks(withMediaType: .audio).first,
+                   let compNewAudioTrack = composition.addMutableTrack(withMediaType: .audio, preferredTrackID: kCMPersistentTrackID_Invalid) {
+                    let audioDuration = min(exportDuration, audioAsset.duration)
+                    let audioRange = CMTimeRange(start: .zero, duration: audioDuration)
+                    try compNewAudioTrack.insertTimeRange(audioRange, of: newAudioTrack, at: .zero)
+                    
+                    let mixParams = AVMutableAudioMixInputParameters(track: compNewAudioTrack)
+                    mixParams.setVolume(replacementAudioVolume, at: .zero)
+                    audioMixParameters.append(mixParams)
+                }
             }
         } catch {
             print("Composition error: \(error)")
@@ -54,10 +80,20 @@ final class VideoExporter {
         }
         
         let naturalSize = videoTrack.naturalSize.applying(videoTrack.preferredTransform)
-        var videoSize = CGSize(width: abs(naturalSize.width), height: abs(naturalSize.height))
+        var uncroppedSize = CGSize(width: abs(naturalSize.width), height: abs(naturalSize.height))
         
-        // Calculate target render size based on aspect ratio
-        if let targetRatio = aspectRatio.ratioValue {
+        // Swap dimensions if rotated 90 or 270 degrees
+        let isRotatedQuarter = (rotationDegrees == 90 || rotationDegrees == 270)
+        if isRotatedQuarter {
+            uncroppedSize = CGSize(width: uncroppedSize.height, height: uncroppedSize.width)
+        }
+        
+        // Apply normalized cropRect if custom
+        var videoSize = uncroppedSize
+        let isCropped = cropRect.width < 0.999 || cropRect.height < 0.999 || cropRect.origin.x > 0.001 || cropRect.origin.y > 0.001
+        if isCropped {
+            videoSize = CGSize(width: uncroppedSize.width * cropRect.width, height: uncroppedSize.height * cropRect.height)
+        } else if let targetRatio = aspectRatio.ratioValue {
             let currentRatio = videoSize.width / videoSize.height
             if currentRatio > targetRatio {
                 videoSize = CGSize(width: videoSize.height * targetRatio, height: videoSize.height)
@@ -402,7 +438,28 @@ final class VideoExporter {
         instruction.timeRange = CMTimeRange(start: .zero, duration: composition.duration)
         
         let layerInstruction = AVMutableVideoCompositionLayerInstruction(assetTrack: compVideoTrack)
-        layerInstruction.setTransform(videoTrack.preferredTransform, at: .zero)
+        var finalTransform = videoTrack.preferredTransform
+        if isCropped {
+            let translateX = -uncroppedSize.width * cropRect.origin.x
+            let translateY = -uncroppedSize.height * cropRect.origin.y
+            finalTransform = finalTransform.concatenating(CGAffineTransform(translationX: translateX, y: translateY))
+        }
+        if rotationDegrees != 0 {
+            let radians = CGFloat(rotationDegrees) * .pi / 180.0
+            var rotTransform = CGAffineTransform(rotationAngle: radians)
+            switch rotationDegrees {
+            case 90:
+                rotTransform = CGAffineTransform(translationX: uncroppedSize.height, y: 0).rotated(by: radians)
+            case 180:
+                rotTransform = CGAffineTransform(translationX: uncroppedSize.width, y: uncroppedSize.height).rotated(by: radians)
+            case 270:
+                rotTransform = CGAffineTransform(translationX: 0, y: uncroppedSize.width).rotated(by: radians)
+            default:
+                break
+            }
+            finalTransform = finalTransform.concatenating(rotTransform)
+        }
+        layerInstruction.setTransform(finalTransform, at: .zero)
         instruction.layerInstructions = [layerInstruction]
         videoComposition.instructions = [instruction]
         
@@ -414,6 +471,12 @@ final class VideoExporter {
         exportSession.outputURL = outputURL
         exportSession.outputFileType = .mov
         exportSession.videoComposition = videoComposition
+        
+        if !audioMixParameters.isEmpty {
+            let audioMix = AVMutableAudioMix()
+            audioMix.inputParameters = audioMixParameters
+            exportSession.audioMix = audioMix
+        }
         
         exportSession.exportAsynchronously {
             DispatchQueue.main.async {

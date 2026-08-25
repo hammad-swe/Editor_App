@@ -21,13 +21,16 @@ class ExportPreviewViewController: UIViewController {
 
     private var player: AVPlayer!
     private var playerLayer: AVPlayerLayer!
+    private let shareButton = UIButton(type: .system)
+    private let infoBadgeStack = UIStackView()
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "Preview"
+        title = "Export Preview"
         setupPlayer()
         setupNavButtons()
         setupButtonsUI()
+        setupInfoBadges()
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -41,6 +44,10 @@ class ExportPreviewViewController: UIViewController {
     }
 
     private func setupPlayer() {
+        playerContainerView.layer.cornerRadius = 18
+        playerContainerView.layer.masksToBounds = true
+        playerContainerView.backgroundColor = .black
+        
         player = AVPlayer(url: exportedVideoURL)
         playerLayer = AVPlayerLayer(player: player)
         playerLayer.frame = playerContainerView.bounds
@@ -71,14 +78,54 @@ class ExportPreviewViewController: UIViewController {
         navigationItem.rightBarButtonItem = doneButton
     }
 
+    private func setupInfoBadges() {
+        let tag1 = createBadgeLabel(text: "🎬 HD 1080p", color: .systemBlue)
+        let tag2 = createBadgeLabel(text: "⚡ Ready to Share", color: .systemPurple)
+        
+        infoBadgeStack.axis = .horizontal
+        infoBadgeStack.spacing = 8
+        infoBadgeStack.alignment = .center
+        infoBadgeStack.distribution = .equalSpacing
+        infoBadgeStack.translatesAutoresizingMaskIntoConstraints = false
+        
+        infoBadgeStack.addArrangedSubview(tag1)
+        infoBadgeStack.addArrangedSubview(tag2)
+        
+        view.addSubview(infoBadgeStack)
+        
+        NSLayoutConstraint.activate([
+            infoBadgeStack.topAnchor.constraint(equalTo: playerContainerView.bottomAnchor, constant: 12),
+            infoBadgeStack.centerXAnchor.constraint(equalTo: view.centerXAnchor)
+        ])
+    }
+    
+    private func createBadgeLabel(text: String, color: UIColor) -> UILabel {
+        let label = UILabel()
+        label.text = "  \(text)  "
+        label.font = .systemFont(ofSize: 12, weight: .bold)
+        label.textColor = color
+        label.backgroundColor = color.withAlphaComponent(0.12)
+        label.layer.cornerRadius = 8
+        label.layer.masksToBounds = true
+        return label
+    }
+
     private func setupButtonsUI() {
         if saveProjectButton != nil {
-            saveProjectButton.layer.cornerRadius = 10
+            saveProjectButton.layer.cornerRadius = 14
             saveProjectButton.backgroundColor = .systemBlue
+            saveProjectButton.setTitle(" Save Project", for: .normal)
+            saveProjectButton.setImage(UIImage(systemName: "folder.badge.plus"), for: .normal)
+            saveProjectButton.tintColor = .white
+            saveProjectButton.titleLabel?.font = .systemFont(ofSize: 15, weight: .bold)
         }
         if exportGalleryButton != nil {
-            exportGalleryButton.layer.cornerRadius = 10
+            exportGalleryButton.layer.cornerRadius = 14
             exportGalleryButton.backgroundColor = .systemGreen
+            exportGalleryButton.setTitle(" Export to Photos", for: .normal)
+            exportGalleryButton.setImage(UIImage(systemName: "arrow.down.to.line.square"), for: .normal)
+            exportGalleryButton.tintColor = .white
+            exportGalleryButton.titleLabel?.font = .systemFont(ofSize: 15, weight: .bold)
         }
     }
 
