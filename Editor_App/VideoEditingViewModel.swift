@@ -12,13 +12,32 @@ final class VideoEditingViewModel {
     
     private(set) var model: VideoEditingModel
     var currentStepIndex: Int = 0
-    let totalSteps: Int = 5
+    let totalSteps: Int = 6
     
     var isFirstStep: Bool { currentStepIndex == 0 }
     var isLastStep: Bool { currentStepIndex == totalSteps - 1 }
     
     init(videoURL: URL) {
         self.model = VideoEditingModel(videoURL: videoURL)
+    }
+    
+    // MARK: - Auto Captions & Translation
+    
+    func generateAutoCaptions(completion: @escaping ([CaptionSegment]) -> Void) {
+        SpeechCaptionService.shared.transcribeVideoAudio(videoURL: model.videoURL) { [weak self] segments in
+            self?.model.captions = segments
+            self?.model.isCaptionsEnabled = !segments.isEmpty
+            completion(segments)
+        }
+    }
+    
+    func translateCaptions(to language: String) {
+        model.captionLanguage = language
+        model.captions = CaptionTranslationService.shared.translate(captions: model.captions, to: language)
+    }
+    
+    func setCaptionStyle(_ style: CaptionStyle) {
+        model.captionStyle = style
     }
     
     // MARK: - Transform & Crop Helpers
@@ -160,6 +179,8 @@ final class VideoEditingViewModel {
             cropRect: model.cropRect,
             headlineText: model.headlineText,
             headlineFont: model.headlineFont,
+            captions: model.isCaptionsEnabled ? model.captions : [],
+            captionStyle: model.captionStyle,
             trimStartTime: model.trimStartTime,
             trimEndTime: model.trimEndTime,
             muteOriginalAudio: model.muteOriginalAudio,

@@ -28,6 +28,8 @@ final class VideoExporter {
         cropRect: CGRect = CGRect(x: 0, y: 0, width: 1, height: 1),
         headlineText: String? = nil,
         headlineFont: UIFont = .systemFont(ofSize: 17, weight: .bold),
+        captions: [CaptionSegment] = [],
+        captionStyle: CaptionStyle = .darkBanner,
         trimStartTime: CMTime = .zero,
         trimEndTime: CMTime? = nil,
         muteOriginalAudio: Bool = false,
@@ -418,6 +420,52 @@ final class VideoExporter {
                 textLayer.alignmentMode = .center
                 textLayer.frame = CGRect(x: tickerAreaX, y: textY, width: tickerAreaWidth, height: textSize.height + 10)
                 bannerLayer.addSublayer(textLayer)
+            }
+        }
+        
+        // MARK: - Auto Captions Subtitles Layer Rendering
+        if !captions.isEmpty {
+            let subH: CGFloat = max(36.0, videoSize.height * 0.08)
+            let subY: CGFloat = videoSize.height * 0.08
+            let subW: CGFloat = videoSize.width * 0.88
+            let subX: CGFloat = (videoSize.width - subW) / 2.0
+            
+            for seg in captions {
+                let subContainer = CALayer()
+                subContainer.frame = CGRect(x: subX, y: subY, width: subW, height: subH)
+                subContainer.backgroundColor = captionStyle.backgroundColor.cgColor
+                subContainer.cornerRadius = 8
+                subContainer.opacity = 0 // hidden by default
+                
+                let subTextLayer = CATextLayer()
+                subTextLayer.string = seg.text
+                subTextLayer.font = UIFont.systemFont(ofSize: max(14.0, subH * 0.45), weight: .bold)
+                subTextLayer.fontSize = max(14.0, subH * 0.45)
+                subTextLayer.foregroundColor = captionStyle.textColor.cgColor
+                subTextLayer.alignmentMode = .center
+                subTextLayer.contentsScale = 2.0
+                subTextLayer.frame = CGRect(x: 4, y: (subH - max(14.0, subH * 0.45)) / 2, width: subW - 8, height: subH)
+                subContainer.addSublayer(subTextLayer)
+                
+                let fadeIn = CABasicAnimation(keyPath: "opacity")
+                fadeIn.fromValue = 0.0
+                fadeIn.toValue = 1.0
+                fadeIn.beginTime = AVCoreAnimationBeginTimeAtZero + seg.startTime
+                fadeIn.duration = 0.1
+                fadeIn.fillMode = .forwards
+                fadeIn.isRemovedOnCompletion = false
+                
+                let fadeOut = CABasicAnimation(keyPath: "opacity")
+                fadeOut.fromValue = 1.0
+                fadeOut.toValue = 0.0
+                fadeOut.beginTime = AVCoreAnimationBeginTimeAtZero + seg.startTime + seg.duration
+                fadeOut.duration = 0.1
+                fadeOut.fillMode = .forwards
+                fadeOut.isRemovedOnCompletion = false
+                
+                subContainer.add(fadeIn, forKey: "fadeIn_\(seg.startTime)")
+                subContainer.add(fadeOut, forKey: "fadeOut_\(seg.startTime)")
+                overlayLayer.addSublayer(subContainer)
             }
         }
         

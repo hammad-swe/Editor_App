@@ -84,7 +84,7 @@ class FrameTemplatesViewController: UIViewController, EditorStepViewController {
     }
     
     private func setupUI() {
-        stepLabel.text = "Step 3 of \(viewModel?.totalSteps ?? 5): Choose Frame Template"
+        stepLabel.text = "Step 1 of \(viewModel?.totalSteps ?? 6): Choose Frame Template"
         sectionTitleLabel.text = "SELECT BROADCAST TEMPLATE"
         
         // Video Container styling - Larger Default View

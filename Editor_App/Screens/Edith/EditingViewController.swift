@@ -77,22 +77,32 @@ class EditingViewController: UIViewController {
         let newStepVC: EditorStepViewController
         switch index {
         case 0:
-            let cutVC = VideoCutSplitViewController(nibName: "VideoCutSplitViewController", bundle: nil)
-            cutVC.viewModel = viewModel
-            newStepVC = cutVC
-        case 1:
-            let cropVC = CropRotateViewController(nibName: "CropRotateViewController", bundle: nil)
-            cropVC.viewModel = viewModel
-            newStepVC = cropVC
-        case 2:
+            // 1st Screen: Templates
             let frameVC = FrameTemplatesViewController(nibName: "FrameTemplatesViewController", bundle: nil)
             frameVC.viewModel = viewModel
             newStepVC = frameVC
+        case 1:
+            // 2nd Screen: Caption
+            let captionsVC = AutoCaptionsViewController(nibName: "AutoCaptionsViewController", bundle: nil)
+            captionsVC.viewModel = viewModel
+            newStepVC = captionsVC
+        case 2:
+            // 3rd Screen: Audio
+            let audioVC = AudioManagerViewController(nibName: "AudioManagerViewController", bundle: nil)
+            audioVC.viewModel = viewModel
+            newStepVC = audioVC
         case 3:
+            // 4th Screen: Crop and rotate
+            let cropVC = CropRotateViewController(nibName: "CropRotateViewController", bundle: nil)
+            cropVC.viewModel = viewModel
+            newStepVC = cropVC
+        case 4:
+            // 5th Screen: Logo
             let logoVC = AddLogoStepViewController(nibName: "AddLogoStepViewController", bundle: nil)
             logoVC.viewModel = viewModel
             newStepVC = logoVC
-        case 4:
+        case 5:
+            // 6th Screen: Headline (Text)
             let textVC = AddTextStepViewController(nibName: "AddTextStepViewController", bundle: nil)
             textVC.viewModel = viewModel
             newStepVC = textVC

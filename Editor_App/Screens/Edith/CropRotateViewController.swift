@@ -50,7 +50,7 @@ class CropRotateViewController: UIViewController, EditorStepViewController {
     }
 
     private func setupUI() {
-        stepLabel.text = "Step 2 of \(viewModel?.totalSteps ?? 5): Crop, Rotate & Aspect Ratio"
+        stepLabel.text = "Step 4 of \(viewModel?.totalSteps ?? 6): Crop, Rotate & Aspect Ratio"
         videoContainerView.layer.cornerRadius = 16
         videoContainerView.clipsToBounds = true
         videoContainerView.backgroundColor = .black

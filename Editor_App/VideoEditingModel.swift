@@ -33,4 +33,10 @@ struct VideoEditingModel {
     var muteOriginalAudio: Bool = false
     var replacementAudioURL: URL? = nil
     var replacementAudioVolume: Float = 1.0
+    
+    // Auto Captions & Translation properties
+    var captions: [CaptionSegment] = []
+    var captionLanguage: String = "English"
+    var isCaptionsEnabled: Bool = false
+    var captionStyle: CaptionStyle = .darkBanner
 }

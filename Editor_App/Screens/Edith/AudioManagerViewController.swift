@@ -10,18 +10,22 @@ import AVFoundation
 import UniformTypeIdentifiers
 import PhotosUI
 
-class AudioManagerViewController: UIViewController {
+class AudioManagerViewController: UIViewController, EditorStepViewController {
 
+    weak var stepDelegate: EditorStepDelegate?
     var viewModel: VideoEditingViewModel!
     var onComplete: (() -> Void)?
 
+    @IBOutlet weak var stepLabel: UILabel!
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var videoContainerView: UIView!
     @IBOutlet weak var muteSwitch: UISwitch!
     @IBOutlet weak var addAudioButton: UIButton!
     @IBOutlet weak var audioNameLabel: UILabel!
     @IBOutlet weak var volumeSlider: UISlider!
-    @IBOutlet weak var saveButton: UIButton!
+    @IBOutlet weak var backButton: UIButton!
+    @IBOutlet weak var skipButton: UIButton!
+    @IBOutlet weak var nextButton: UIButton!
 
     private var player: AVPlayer?
     private var playerLayer: AVPlayerLayer?
@@ -42,14 +46,22 @@ class AudioManagerViewController: UIViewController {
     }
 
     private func setupUI() {
+        stepLabel?.text = "Step 3 of \(viewModel?.totalSteps ?? 6): Audio Manager"
         videoContainerView.layer.cornerRadius = 14
         videoContainerView.clipsToBounds = true
         videoContainerView.backgroundColor = .black
 
         addAudioButton.layer.cornerRadius = 10
-        saveButton.layer.cornerRadius = 12
-
         muteSwitch.onTintColor = .systemBlue
+
+        backButton?.layer.cornerRadius = 10
+        skipButton?.layer.cornerRadius = 10
+        nextButton?.layer.cornerRadius = 10
+
+        if let vm = viewModel {
+            backButton?.isEnabled = !vm.isFirstStep
+            backButton?.alpha = vm.isFirstStep ? 0.5 : 1.0
+        }
     }
 
     private func setupPlayer() {
@@ -126,12 +138,24 @@ class AudioManagerViewController: UIViewController {
         viewModel?.setReplacementAudio(url: selectedAudioURL, volume: sender.value)
     }
 
-    @IBAction func saveTapped(_ sender: UIButton) {
+    // MARK: - EditorStepViewController Protocol
+
+    @IBAction func backTapped(_ sender: UIButton) {
+        stepDelegate?.stepDidTapBack(self)
+    }
+
+    @IBAction func skipTapped(_ sender: UIButton) {
+        stepDelegate?.stepDidTapSkip(self)
+    }
+
+    @IBAction func nextTapped(_ sender: UIButton) {
+        applyToViewModel()
+        stepDelegate?.stepDidTapNext(self)
+    }
+
+    func applyToViewModel() {
         viewModel?.setMuteOriginalAudio(muteSwitch.isOn)
         viewModel?.setReplacementAudio(url: selectedAudioURL, volume: volumeSlider.value)
-        dismiss(animated: true) { [weak self] in
-            self?.onComplete?()
-        }
     }
 }
 
